@@ -44,6 +44,11 @@ class Pokemon {
     }
   }
 
+  Pokemon.filler()
+      : _id = 0,
+        _name = "",
+        _icon = "";
+
   Pokemon.fromJson(Map<String, dynamic> info)
       : _id = info["id"],
         _name = info["name"],

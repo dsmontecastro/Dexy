@@ -18,8 +18,12 @@ class Body extends StatefulWidget {
 }
 
 class BodyState extends State<Body> {
+  // Body of App Proper
+
+  // Constant Properties
   static const alignment = MainAxisAlignment.spaceEvenly;
 
+  // Index State
   int index = 0;
 
   int getIndex() => index;
@@ -27,18 +31,23 @@ class BodyState extends State<Body> {
   void setIndex(int value) {
     setState(() {
       index = value;
-      print("Body: $index");
+      // print("Body: $index");
     });
   }
 
   @override
   Widget build(context) {
+    // Build Proper
+
+    // Get Pokedex from Initialized Class
     List<Pokemon> pokedex = Pokedex.pokedex
         .where((pokemon) => pokemon.name.startsWith(widget.searchController.text))
         .toList();
+
+    // Core Children
     List<Widget> children = [
-      Expanded(child: bodyUpper(pokedex[index])),
-      Expanded(child: bodyLower(pokedex, setIndex, getIndex))
+      bodyUpper(pokedex[index]),
+      bodyLower(pokedex, setIndex, getIndex)
     ];
 
     return OrientationBuilder(
@@ -49,7 +58,10 @@ class BodyState extends State<Body> {
         return Flex(
           mainAxisAlignment: alignment,
           direction: direction,
-          children: children,
+          children: List.generate(
+            children.length,
+            (int i) => Expanded(child: Center(child: children[i])),
+          ),
         );
       },
     );

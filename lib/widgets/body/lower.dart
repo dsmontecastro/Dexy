@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:pokedex/extensions.dart';
 import 'package:pokedex/api/pokemon.dart';
 
 class Lower extends StatefulWidget {
@@ -13,23 +14,50 @@ class Lower extends StatefulWidget {
 }
 
 class LowerState extends State<Lower> {
-  static final controller = PageController(viewportFraction: 0.1);
+  static const itemCount = 10;
+
+  static final controller = PageController(viewportFraction: 1 / itemCount);
 
   @override
   Widget build(context) {
-    final List<Pokemon> pokedex = widget.pokedex;
+    // Build Proper
 
-    return Center(
-      // alignment: Alignment.topCenter,
+    // Filler List for PageView Smoothing
+    final List<Pokemon> filler = List.generate(
+      itemCount - 1,
+      (index) => Pokemon.filler(),
+    );
+
+    // Pokedex w/ Fillers
+    final List<Pokemon> pokedex = widget.pokedex + filler;
+
+    // Index State Modifier
+    void updateIndex(int value) {
+      int maxValue = widget.pokedex.length;
+      if (value.inRange(0, maxValue)) {
+        widget.setter(value);
+      }
+    }
+
+    return Scrollbar(
+      // Scrollbar Container
+
+      // Scrollbar Settings
+      thumbVisibility: true,
+      controller: controller,
+
+      // Core PageView Widget
       child: PageView.builder(
-        // Scroller Data
+        // Page Builder
+
+        // Scroller Properties
         padEnds: false,
         controller: controller,
-        onPageChanged: widget.setter,
+        onPageChanged: updateIndex,
         scrollDirection: Axis.vertical,
         physics: const PageScrollPhysics(),
 
-        // Item Data
+        // Item Properties
         itemCount: pokedex.length,
         itemBuilder: (context, index) {
           bool isPicked = (index == widget.getter());
