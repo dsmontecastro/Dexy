@@ -1,7 +1,5 @@
 import '_model.dart';
 
-import 'package:pokedex/database/models/species.dart';
-
 const String generationModel = "generation";
 
 class Generation implements Model {
