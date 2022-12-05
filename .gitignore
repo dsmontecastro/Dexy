@@ -52,4 +52,4 @@ web
 windows
 
 # Hidden
-lib/api/old/
+**/old

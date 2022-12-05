@@ -1,15 +1,15 @@
 import '_model.dart';
 
-const String targetModel = "target";
+const String damageClassModel = "move-damage-class";
 
-class Target extends Model {
+class DamageClass extends Model {
   //----------------------------------------------------------------------------
 
   @override
   int getId() => id;
 
   @override
-  List<String> getFields() => TargetFields.fields;
+  List<String> getFields() => DamageClassFields.fields;
 
   final int id;
   final String description;
@@ -18,38 +18,37 @@ class Target extends Model {
   //----------------------------------------------------------------------------
 
   // Core Constructor
-  Target({required this.id, required this.description});
+  DamageClass({required this.id, required this.description});
 
   // JSON Parsing
-  Target.make(Map<String, dynamic> json)
-      : id = json[TargetFields.id],
-        description = json[TargetFields.description];
+  DamageClass.make(Map<String, dynamic> json)
+      : id = json[DamageClassFields.id],
+        description = json[DamageClassFields.description];
 
   @override
-  Target fromDB(Map<String, dynamic> json) => Target.make(json);
+  DamageClass fromDB(Map<String, dynamic> json) => DamageClass.make(json);
 
   @override
-  Target fromAPI(Map<String, dynamic> json) {
-    // Re-map some Fields & Keys
-    json[TargetFields.description] = _getDescription(json);
-    return Target.make(json);
+  DamageClass fromAPI(Map<String, dynamic> json) {
+    json[DamageClassFields.description] = _getDescription(json);
+    return DamageClass.make(json);
   }
 
   @override
   Map<String, dynamic> toDB() => {
-        TargetFields.id: id,
-        TargetFields.description: description,
+        DamageClassFields.id: id,
+        DamageClassFields.description: description,
       };
 
   // Helper Functions
   String _getDescription(Map<String, dynamic> json) {
     List<Map> descriptions = json["descriptions"];
     Iterable slot = descriptions.where((slot) => slot["language"]["name"] == "en");
-    return slot.first[TargetFields.description];
+    return slot.first[DamageClassFields.description];
   }
 }
 
-class TargetFields {
+class DamageClassFields {
   static const List<String> fields = [id, description];
 
   static const String id = "id";

@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
-import 'package:pokedex/database/models/sprites.dart';
 
-import 'database.dart';
+import 'db.dart';
 import 'models/_model.dart';
 import 'models/pokemon.dart';
 
-extension PokeAPI on PokedexDB {
+extension API on DB {
   // API Calls for Updating the DB
 
   // Constants
@@ -21,7 +19,7 @@ extension PokeAPI on PokedexDB {
   //   await updateX();
   // }
 
-  Future<bool> updateTable(String tableName) async {
+  Future<bool> updateModel(String tableName) async {
     bool success = true;
 
     try {
@@ -54,6 +52,7 @@ extension PokeAPI on PokedexDB {
 
   Future<bool> updateRow(String tableName, String url) async {
     bool success = false;
+    bool isPokemon = tableName == pokemonModel;
 
     try {
       Response resp = await get(Uri.parse(url));
@@ -63,16 +62,23 @@ extension PokeAPI on PokedexDB {
         List<Map<String, dynamic>> maps = jsonDecode(resp.body);
 
         await Future.forEach(maps, (map) async {
-          final Table table = tables[tableName] as Table;
-          await add(tableName, table.fromJson(map));
+          final Model table = models[tableName] as Model;
 
-          if (tableName == pokemonTable) {
-            String icon = map["sprites"]["versions"]["generation-viii"]["front_default"];
-            String image = map["sprites"]["other"]["official-artwork"]["front_default"];
+          if (isPokemon) {
+            // Pokemon Model has special columns
 
-            map["icon"] = await updateSprite(icon);
-            map["image"] = await updateSprite(image);
+            // Save Favorite State (User-Toggled)
+            Pokemon pokemon = await getById(tableName, map[PokemonFields.id]);
+            map[PokemonFields.favorite] = pokemon.favorite;
+
+            // Get & Convert Sprites
+            String iconURL = map["sprites"]["versions"]["generation-viii"]["front_default"];
+            String imageURL = map["sprites"]["other"]["official-artwork"]["front_default"];
+            map[PokemonFields.icon] = await updateSprite(iconURL);
+            map[PokemonFields.image] = await updateSprite(imageURL);
           }
+
+          await upsert(tableName, table.fromAPI(map));
         });
       }
 

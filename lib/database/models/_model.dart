@@ -1,13 +1,15 @@
-abstract class Table {
+abstract class Model {
   // Abstract Model
 
   // List of Fields
   List<String> getFields() => [];
 
   // Core Constructor
-  Table();
+  Model();
+  int getId() => -1;
 
   // JSON Parsing
-  Map<String, dynamic> toJson();
-  dynamic fromJson(Map<String, dynamic> json);
+  Map<String, dynamic> toDB();
+  dynamic fromDB(Map<String, dynamic> json);
+  dynamic fromAPI(Map<String, dynamic> json);
 }

@@ -33,4 +33,5 @@ class SharedPrefs {
   // Miscellanous Functions
   static Future<bool> clear() => _instance.clear();
   static Set<String> getKeys() => _instance.getKeys();
+  static bool hasKey(String key) => _instance.containsKey(key);
 }

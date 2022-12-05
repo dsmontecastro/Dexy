@@ -1,59 +1,86 @@
 import '_model.dart';
 
-const String abilityTable = "ability";
+import 'package:pokedex/extensions/string.dart';
 
-class Ability implements Table {
+const String abilityModel = "ability";
+
+class Ability implements Model {
   //----------------------------------------------------------------------------
+
+  @override
+  int getId() => id;
 
   @override
   List<String> getFields() => AbilityFields.fields;
 
-  // Integers
-  final int id;
-  final int generation; // Foreign
-
   // Strings
   final String name;
   final String effect;
-  final List<int> pokemon;
+
+  // Integers
+  final int id;
+  final int generation; // Foreign Key
 
   //----------------------------------------------------------------------------
 
   // Core Constructor
   Ability(
-      {required this.id,
-      required this.name,
-      required this.effect,
-      required this.pokemon,
-      required this.generation});
+      {required this.id, required this.name, required this.effect, required this.generation});
 
   // JSON Parsing
-  @override
-  Ability fromJson(Map<String, dynamic> json) => Ability.fromJson(json);
-
-  Ability.fromJson(Map<String, dynamic> json)
+  Ability.make(Map<String, dynamic> json)
       : id = json[AbilityFields.id],
         name = json[AbilityFields.name],
         effect = json[AbilityFields.effect],
-        pokemon = json[AbilityFields.pokemon],
         generation = json[AbilityFields.generation];
 
   @override
-  Map<String, dynamic> toJson() => {
+  Ability fromDB(Map<String, dynamic> json) {
+    // Convert from String to List<int>
+    json[AbilityFields.pokemon] = (json[AbilityFields.pokemon] as String).toListInt();
+    return Ability.make(json);
+  }
+
+  @override
+  Ability fromAPI(Map<String, dynamic> json) {
+    // Re-map some Fields & Keys
+    json[AbilityFields.effect] = _getEffect(json);
+    json[AbilityFields.generation] = _getGeneration(json);
+    return Ability.make(json);
+  }
+
+  @override
+  Map<String, dynamic> toDB() => {
         AbilityFields.id: id,
         AbilityFields.name: name,
         AbilityFields.effect: effect,
-        AbilityFields.pokemon: pokemon,
-        AbilityFields.generation: generation
+        AbilityFields.generation: generation,
       };
+
+  // Helper Functions
+  String _getEffect(Map<String, dynamic> json) {
+    List<Map> effects = json["effect_entries"];
+    Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
+    return slot.first[AbilityFields.effect];
+  }
+
+  int _getGeneration(Map<String, dynamic> json) {
+    String url = json[AbilityFields.generation]["url"];
+    return url.getId();
+  }
 }
 
 class AbilityFields {
-  static const List<String> fields = [id, name, effect, pokemon, generation];
+  static const List<String> fields = [id, name, effect, generation, pokemon];
 
-  static const String id = "ID";
-  static const String name = "Name";
-  static const String effect = "Effect";
-  static const String pokemon = "Pokemon";
-  static const String generation = "Generation"; // Foreign
+  // Integers
+  static const String id = "id";
+
+  // Strings
+  static const String name = "name";
+  static const String effect = "short_effect";
+
+  // Foreign Keys
+  static const String generation = "generation";
+  static const String pokemon = "pokemon";
 }
