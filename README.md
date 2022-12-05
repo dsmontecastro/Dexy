@@ -17,6 +17,5 @@ samples, guidance on mobile development, and a full API reference.
 
 ## TO-DO:
 ### Tables/Models:
-- Evolutions
 - Moves: Remove Pokemon?
 - Pokemon: Check Helpers
