@@ -9,9 +9,6 @@ class Evolution implements Model {
   @override
   int getId() => id;
 
-  @override
-  List<String> getFields() => EvolutionFields.fields;
-
   final int id;
   final Map<String, dynamic> chain;
 
@@ -21,19 +18,15 @@ class Evolution implements Model {
   Evolution({required this.id, required this.chain});
 
   // JSON Parsing
-  Evolution.make(Map<String, dynamic> json)
+  @override
+  Evolution.fromAPI(Map<String, dynamic> json)
       : id = json[EvolutionFields.id],
         chain = json[EvolutionFields.chain];
 
   @override
-  Evolution fromDB(Map<String, dynamic> json) {
-    // Convert from JSON to String
-    json[EvolutionFields.chain] = jsonDecode(json[EvolutionFields.chain]);
-    return Evolution.make(json);
-  }
-
-  @override
-  Evolution fromAPI(Map<String, dynamic> json) => Evolution.make(json);
+  Evolution.fromDB(Map<String, dynamic> json)
+      : id = json[EvolutionFields.id],
+        chain = json[EvolutionFields.chain];
 
   @override
   Map<String, dynamic> toDB() =>
@@ -41,8 +34,16 @@ class Evolution implements Model {
 }
 
 class EvolutionFields {
-  static const List<String> fields = [id, chain];
+  const EvolutionFields();
 
   static const String id = "id";
   static const String chain = "chain";
+
+  static const List<String> fields = [id, chain];
 }
+
+const String evolutionMaker = """
+  CREATE TABLE $evolutionModel(
+    ${EvolutionFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${EvolutionFields.chain} TEXT NOT NULL
+  )""";

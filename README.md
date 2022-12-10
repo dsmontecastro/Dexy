@@ -17,5 +17,4 @@ samples, guidance on mobile development, and a full API reference.
 
 ## TO-DO:
 ### Tables/Models:
-- Moves: Remove Pokemon?
-- Pokemon: Check Helpers
+- HeldItems Model

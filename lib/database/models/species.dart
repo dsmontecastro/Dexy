@@ -1,4 +1,6 @@
 import '_model.dart';
+import 'evolution.dart';
+import 'generation.dart';
 
 import 'package:pokedex/extensions/string.dart';
 
@@ -9,9 +11,6 @@ class Species implements Model {
 
   @override
   int getId() => id;
-
-  @override
-  List<String> getFields() => SpeciesFields.fields;
 
   // Strings
   final String name;
@@ -41,32 +40,33 @@ class Species implements Model {
   //----------------------------------------------------------------------------
 
   // Core Constructor
-  Species({
-    required this.name,
-    required this.text,
-    required this.genus,
-    required this.growthRate,
-    required this.hasAlter,
-    required this.hasForms,
-    required this.isLegendary,
-    required this.isMythical,
-    required this.isBaby,
-    required this.id,
-    required this.order,
-    required this.happiness,
-    required this.catchRate,
-    required this.genderRate,
-    required this.evolutions,
-    required this.generation,
-    required this.varieties,
-  });
+  Species(
+      {required this.name,
+      required this.text,
+      required this.genus,
+      required this.growthRate,
+      required this.hasAlter,
+      required this.hasForms,
+      required this.isLegendary,
+      required this.isMythical,
+      required this.isBaby,
+      required this.id,
+      required this.order,
+      required this.happiness,
+      required this.catchRate,
+      required this.genderRate,
+      required this.evolutions,
+      required this.generation,
+      required this.varieties});
 
   // JSON Parsing
-  Species.make(Map<String, dynamic> json)
+
+  @override
+  Species.fromAPI(Map<String, dynamic> json)
       : name = json[SpeciesFields.name],
-        text = json[SpeciesFields.text],
-        genus = json[SpeciesFields.genus],
-        growthRate = json[SpeciesFields.growthRate],
+        text = _getLang(json, SpeciesFields.texts, SpeciesFields.text),
+        genus = _getLang(json, SpeciesFields.genera, SpeciesFields.genus),
+        growthRate = json[SpeciesFields.growthRate]["name"],
         hasAlter = json[SpeciesFields.hasAlter],
         hasForms = json[SpeciesFields.hasForms],
         isLegendary = json[SpeciesFields.isLegendary],
@@ -77,35 +77,29 @@ class Species implements Model {
         happiness = json[SpeciesFields.happiness],
         catchRate = json[SpeciesFields.catchRate],
         genderRate = json[SpeciesFields.genderRate],
+        evolutions = _getURLid(json, SpeciesFields.evolutions),
+        generation = _getURLid(json, SpeciesFields.generation),
+        varieties = _getVarieties(json);
+
+  @override
+  Species.fromDB(Map<String, dynamic> json)
+      : name = json[SpeciesFields.name],
+        text = json[SpeciesFields.text],
+        genus = json[SpeciesFields.genus],
+        growthRate = json[SpeciesFields.growthRate],
+        hasAlter = json[SpeciesFields.hasAlter] == 1,
+        hasForms = json[SpeciesFields.hasForms] == 1,
+        isLegendary = json[SpeciesFields.isLegendary] == 1,
+        isMythical = json[SpeciesFields.isMythical] == 1,
+        isBaby = json[SpeciesFields.isBaby] == 1,
+        id = json[SpeciesFields.id],
+        order = json[SpeciesFields.order],
+        happiness = json[SpeciesFields.happiness],
+        catchRate = json[SpeciesFields.catchRate],
+        genderRate = json[SpeciesFields.genderRate],
         evolutions = json[SpeciesFields.evolutions],
         generation = json[SpeciesFields.generation],
-        varieties = json[SpeciesFields.varieties];
-
-  @override
-  Species fromDB(Map<String, dynamic> json) {
-    // Convert from String to List<int>
-    json[SpeciesFields.varieties] = (json[SpeciesFields.varieties] as String).toListInt();
-    return Species.make(json);
-  }
-
-  @override
-  Species fromAPI(Map<String, dynamic> json) {
-    // Re-map some Fields & Keys
-
-    // Strings
-    json[SpeciesFields.text] = _getLang(json, SpeciesFields.texts, SpeciesFields.text);
-    json[SpeciesFields.genus] = _getLang(json, SpeciesFields.genera, SpeciesFields.genus);
-
-    // Foreign Keys
-    json[SpeciesFields.growthRate] = json[SpeciesFields.growthRate]["name"];
-    json[SpeciesFields.evolutions] = _getURLid(json, SpeciesFields.evolutions);
-    json[SpeciesFields.generation] = _getURLid(json, SpeciesFields.generation);
-
-    // List of Foreign Keys: Varieties
-    json[SpeciesFields.varieties] = _getVarieties(json);
-
-    return Species.make(json);
-  }
+        varieties = (json[SpeciesFields.varieties] as String).toListInt();
 
   @override
   Map<String, dynamic> toDB() => {
@@ -113,11 +107,11 @@ class Species implements Model {
         SpeciesFields.text: text,
         SpeciesFields.genus: genus,
         SpeciesFields.growthRate: growthRate,
-        SpeciesFields.hasAlter: hasAlter,
-        SpeciesFields.hasForms: hasForms,
-        SpeciesFields.isLegendary: isLegendary,
-        SpeciesFields.isMythical: isMythical,
-        SpeciesFields.isBaby: isBaby,
+        SpeciesFields.hasAlter: hasAlter ? 1 : 0,
+        SpeciesFields.hasForms: hasForms ? 1 : 0,
+        SpeciesFields.isLegendary: isLegendary ? 1 : 0,
+        SpeciesFields.isMythical: isMythical ? 1 : 0,
+        SpeciesFields.isBaby: isBaby ? 1 : 0,
         SpeciesFields.id: id,
         SpeciesFields.order: order,
         SpeciesFields.happiness: happiness,
@@ -129,18 +123,18 @@ class Species implements Model {
       };
 
   // Helper Functions
-  String _getLang(Map<String, dynamic> json, String field, String subfield) {
+  static String _getLang(Map<String, dynamic> json, String field, String subfield) {
     List<Map> types = json["types"];
     Iterable slot = types.where((slot) => slot["language"]["name"] == "en");
     return slot.first[field];
   }
 
-  int _getURLid(Map<String, dynamic> json, String field) {
+  static int _getURLid(Map<String, dynamic> json, String field) {
     String url = json[field]["url"];
     return url.getId();
   }
 
-  List<int> _getVarieties(Map<String, dynamic> json) {
+  static List<int> _getVarieties(Map<String, dynamic> json) {
     List<int> varieties = [];
 
     for (final pokemon in json[SpeciesFields.varieties]) {
@@ -153,7 +147,7 @@ class Species implements Model {
 }
 
 class SpeciesFields {
-  // Field Information
+  const SpeciesFields();
 
   // Strings
   static const name = "name";
@@ -204,3 +198,26 @@ class SpeciesFields {
     varieties
   ];
 }
+
+const String speciesMaker = """
+  CREATE TABLE $speciesModel(
+    ${SpeciesFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${SpeciesFields.name} TEXT NOT NULL,
+    ${SpeciesFields.text} TEXT NOT NULL,
+    ${SpeciesFields.genus} TEXT NOT NULL,
+    ${SpeciesFields.growthRate} TEXT NOT NULL,
+    ${SpeciesFields.hasAlter} INTEGER NOT NULL,
+    ${SpeciesFields.hasForms} INTEGER NOT NULL,
+    ${SpeciesFields.isLegendary} INTEGER NOT NULL,
+    ${SpeciesFields.isMythical} INTEGER NOT NULL,
+    ${SpeciesFields.isBaby} INTEGER NOT NULL,
+    ${SpeciesFields.order} INTEGER NOT NULL,
+    ${SpeciesFields.happiness} INTEGER NOT NULL,
+    ${SpeciesFields.catchRate} INTEGER NOT NULL,
+    ${SpeciesFields.genderRate} INTEGER NOT NULL,
+    ${SpeciesFields.evolutions} INTEGER NOT NULL,
+    ${SpeciesFields.generation} INTEGER NOT NULL,
+    ${SpeciesFields.varieties} INTEGER NOT NULL,
+    FOREIGN KEY (${SpeciesFields.evolutions}) REFERENCES $evolutionModel (id),
+    FOREIGN KEY (${SpeciesFields.generation}) REFERENCES $generationModel (id)
+  )""";

@@ -3,43 +3,22 @@ import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 
 import 'models/_model.dart';
-import 'models/abilities.dart';
 import 'models/pokemon.dart';
-import 'models/species.dart';
-// import 'models/sprites.dart';
-import 'models/target.dart';
-import 'models/moves.dart';
-
-class Types {
-  static const pKeyType = "INTEGER PRIMARY KEY NOT NULL";
-  static const boolType = "BOOLEAN NOT NULL";
-  static const textType = "TEXT NOT NULL";
-  static const intType = "INTEGER NOT NULL";
-  static const nIullntType = "INTEGER";
-}
-
-const Map<String, Type> models = {
-  abilityModel: Ability,
-  pokemonModel: Pokemon,
-  speciesModel: Species,
-  // spriteModel: Sprite,
-  targetModel: Target,
-  moveModel: Move,
-};
 
 class DB {
-  //----------------------------------------------------------------------------
+  //
 
-  // Constants
+  // Constants -----------------------------------------------------------------
+
   static const String dbName = "PokeDB";
 
-  // Instantiation
+  // Instantiation -------------------------------------------------------------
+
   static final DB instance = DB._init();
   DB._init();
 
-  //----------------------------------------------------------------------------
+  // Database Property ---------------------------------------------------------
 
-  // Database Property
   static Database? _database;
 
   Future<Database?> get database async {
@@ -47,16 +26,14 @@ class DB {
     return _database;
   }
 
-  //----------------------------------------------------------------------------
-
-  // Core Database Methods
+  // Core Database Methods -----------------------------------------------------
 
   Future close() async {
     final Database? db = await instance.database;
     db!.close();
   }
 
-  Future<int> insert(String tableName, Model item) async {
+  Future<int> insert<M extends Model>(String tableName, M item) async {
     final Database? db = await instance.database;
     return await db!.insert(
       tableName,
@@ -65,7 +42,7 @@ class DB {
     );
   }
 
-  Future<int> update(String tableName, Model item) async {
+  Future<int> update<M extends Model>(String tableName, M item) async {
     final Database? db = await instance.database;
     return await db!.update(
       tableName,
@@ -75,9 +52,10 @@ class DB {
     );
   }
 
-  Future<int> upsert(String tablename, Model item) async {
-    // final Database? db = await instance.database;
-    final int id = await getById(tablename, item.getId());
+  // Future<int> upsert(String tablename, Map<String, dynamic> json) async {
+  // final int id = await getById(tablename, json["id"] as int);
+  Future<int> upsert<M extends Model>(String tablename, M item) async {
+    final int id = await getById<M>(tablename, item.getId());
 
     if (id >= 0) {
       return await update(tablename, item);
@@ -86,36 +64,71 @@ class DB {
     }
   }
 
-  Future getById(String tableName, int id) async {
+  Future<int> delete<M extends Model>(String tableName, M item) async {
     final Database? db = await instance.database;
-    final Model table = models[tableName] as Model;
+    return await db!.delete(
+      tableName,
+      where: "id = ?",
+      whereArgs: [item.getId()],
+    );
+  }
+
+  Future getById<M extends Model>(String tableName, int id) async {
+    final Database? db = await instance.database;
 
     final query = await db!.query(
       tableName,
-      columns: table.getFields(),
       where: "id = ?",
       whereArgs: [id],
+      columns: Models.fields[M],
     );
 
     try {
-      return table.fromDB(query.first);
+      return Models.fromDB(query.first);
     } catch (err) {
       throw Exception(err);
     }
   }
 
-  Future<List> getAll(String tableName) async {
+  Future<List> getAll<M extends Model>(String tableName) async {
     final Database? db = await instance.database;
-    final Model table = models[tableName] as Model;
-    final fields = table.getFields();
 
-    final query = await db!.query(tableName, columns: fields, orderBy: "ID ASC");
-    return query.map((item) => table.fromDB(item)).toList();
+    final query = await db!.query(
+      tableName,
+      orderBy: "ID ASC",
+      columns: Models.fields[M],
+    );
+
+    return query.map((item) => Models.fromDB(query.first)).toList();
   }
 
-  //----------------------------------------------------------------------------
+  // Favorite/Caught Toggles ---------------------------------------------------
 
-  // Initialization
+  Future<int> toggleFavorite(Pokemon pokemon) async {
+    final Database? db = await instance.database;
+    pokemon.favorite = !pokemon.favorite;
+    return await db!.update(
+      pokemonModel,
+      pokemon.toDB(),
+      where: "id = ?",
+      whereArgs: [pokemon.id],
+    );
+  }
+
+  Future<int> toggleCaught(Pokemon pokemon) async {
+    final Database? db = await instance.database;
+    pokemon.caught = !pokemon.caught;
+
+    return await db!.update(
+      pokemonModel,
+      pokemon.toDB(),
+      where: "id = ?",
+      whereArgs: [pokemon.id],
+    );
+  }
+
+  // Configuration & Initialization --------------------------------------------
+
   Future<Database> _init(String fileName) async {
     final String dbPath = await getDatabasesPath();
     final String filePath = path.join(dbPath + fileName);
@@ -127,9 +140,9 @@ class DB {
   Future _onConfigure(Database db) async => await db.execute("PRAGMA foreign_keys = ON");
 
   Future _onCreate(Database db, int version) async {
-    // Pokemon Model
-    await db.execute("""
-    CREATE TABLE
-    """);
+    // Create TABLEs from Models
+    for (String maker in Models.makers) {
+      await db.execute(maker);
+    }
   }
 }

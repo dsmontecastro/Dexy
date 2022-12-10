@@ -2,14 +2,11 @@ import '_model.dart';
 
 const String damageClassModel = "move-damage-class";
 
-class DamageClass extends Model {
+class DamageClass implements Model {
   //----------------------------------------------------------------------------
 
   @override
   int getId() => id;
-
-  @override
-  List<String> getFields() => DamageClassFields.fields;
 
   final int id;
   final String description;
@@ -21,18 +18,15 @@ class DamageClass extends Model {
   DamageClass({required this.id, required this.description});
 
   // JSON Parsing
-  DamageClass.make(Map<String, dynamic> json)
+  @override
+  DamageClass.fromAPI(Map<String, dynamic> json)
+      : id = json[DamageClassFields.id],
+        description = _getDescription(json);
+
+  @override
+  DamageClass.fromDB(Map<String, dynamic> json)
       : id = json[DamageClassFields.id],
         description = json[DamageClassFields.description];
-
-  @override
-  DamageClass fromDB(Map<String, dynamic> json) => DamageClass.make(json);
-
-  @override
-  DamageClass fromAPI(Map<String, dynamic> json) {
-    json[DamageClassFields.description] = _getDescription(json);
-    return DamageClass.make(json);
-  }
 
   @override
   Map<String, dynamic> toDB() => {
@@ -41,7 +35,7 @@ class DamageClass extends Model {
       };
 
   // Helper Functions
-  String _getDescription(Map<String, dynamic> json) {
+  static String _getDescription(Map<String, dynamic> json) {
     List<Map> descriptions = json["descriptions"];
     Iterable slot = descriptions.where((slot) => slot["language"]["name"] == "en");
     return slot.first[DamageClassFields.description];
@@ -49,8 +43,16 @@ class DamageClass extends Model {
 }
 
 class DamageClassFields {
-  static const List<String> fields = [id, description];
+  const DamageClassFields();
 
   static const String id = "id";
   static const String description = "description";
+
+  static const List<String> fields = [id, description];
 }
+
+const String damageClassMaker = """
+  CREATE TABLE $damageClassModel(
+    ${DamageClassFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${DamageClassFields.description} TEXT NOT NULL
+  )""";

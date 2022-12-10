@@ -1,4 +1,8 @@
 import '_model.dart';
+import 'target.dart';
+import 'pkmn_type.dart';
+import 'generation.dart';
+import 'damage_class.dart';
 
 import 'package:pokedex/extensions/string.dart';
 
@@ -9,9 +13,6 @@ class Move implements Model {
 
   @override
   int getId() => id;
-
-  @override
-  List<String> getFields() => MoveFields.fields;
 
   // Strings
   final String name;
@@ -31,7 +32,6 @@ class Move implements Model {
   final int target;
   final int generation;
   final int damageClass;
-  // final List<int> pokemon;
 
   //----------------------------------------------------------------------------
 
@@ -49,11 +49,27 @@ class Move implements Model {
       required this.target,
       required this.generation,
       required this.damageClass,
-      // required this.pokemon,
       required this.statChanges});
 
   // JSON Parsing
-  Move.make(Map<String, dynamic> json)
+  @override
+  Move.fromAPI(Map<String, dynamic> json)
+      : name = json[MoveFields.name],
+        effect = _getEffect(json),
+        id = json[MoveFields.id],
+        pp = json[MoveFields.pp],
+        power = json[MoveFields.power],
+        accuracy = json[MoveFields.pp],
+        priority = json[MoveFields.priority],
+        effectChance = json[MoveFields.effectChance],
+        type = _getById(json, MoveFields.type),
+        target = _getById(json, MoveFields.target),
+        generation = _getById(json, MoveFields.generation),
+        damageClass = _getById(json, MoveFields.damageClass),
+        statChanges = _getStatChanges(json);
+
+  @override
+  Move.fromDB(Map<String, dynamic> json)
       : name = json[MoveFields.name],
         effect = json[MoveFields.effect],
         id = json[MoveFields.id],
@@ -66,33 +82,7 @@ class Move implements Model {
         target = json[MoveFields.target],
         generation = json[MoveFields.generation],
         damageClass = json[MoveFields.damageClass],
-        // pokemon = json[MoveFields.pokemon],
-        statChanges = json[MoveFields.statChanges];
-
-  @override
-  Move fromDB(Map<String, dynamic> json) {
-    // Convert from String to List<int>
-    json[MoveFields.statChanges] = (json[MoveFields.statChanges] as String).toListInt();
-    return Move.make(json);
-  }
-
-  @override
-  Move fromAPI(Map<String, dynamic> json) {
-    // Re-map some Fields & Keys
-
-    // Properties
-    json[MoveFields.effect] = _getEffect(json);
-    json[MoveFields.statChanges] = _getStatChanges(json);
-
-    // Foreign Keys
-    json[MoveFields.type] = _getById(json, MoveFields.type);
-    json[MoveFields.target] = _getById(json, MoveFields.target);
-    json[MoveFields.generation] = _getById(json, MoveFields.generation);
-    json[MoveFields.damageClass] = _getById(json, MoveFields.damageClass);
-    // json[MoveFields.pokemon] = _getPokemon(json);
-
-    return Move.make(json);
-  }
+        statChanges = (json[MoveFields.statChanges] as String).toListInt();
 
   @override
   Map<String, dynamic> toDB() => {
@@ -108,18 +98,17 @@ class Move implements Model {
         MoveFields.target: target,
         MoveFields.generation: generation,
         MoveFields.damageClass: damageClass,
-        // MoveFields.pokemon: pokemon,
         MoveFields.statChanges: statChanges.join(separator)
       };
 
   // Helper Functions
-  String _getEffect(Map<String, dynamic> json) {
+  static String _getEffect(Map<String, dynamic> json) {
     List<Map> effects = json["effect_entries"];
     Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
     return slot.first[MoveFields.effect];
   }
 
-  List<int> _getStatChanges(Map<String, dynamic> json) {
+  static List<int> _getStatChanges(Map<String, dynamic> json) {
     List<Map> maps = json[MoveFields.statChanges];
     List<int> changes = List.filled(6, 0);
 
@@ -133,27 +122,19 @@ class Move implements Model {
     return changes;
   }
 
-  int _getById(Map<String, dynamic> json, String field) {
+  static int _getById(Map<String, dynamic> json, String field) {
     String url = json[field]["url"];
     return url.getId();
   }
-
-  // List<int> _getPokemon(Map<String, dynamic> json) {
-  //   List<int> pokemons = [];
-
-  //   for (final pokemon in json[MoveFields.pokemon]) {
-  //     String url = pokemon["url"];
-  //     pokemons.add(url.getId());
-  //   }
-
-  //   return pokemons;
-  // }
 }
 
 class MoveFields {
+  const MoveFields();
+
   // Strings
   static const String name = "name";
   static const String effect = "short_effect";
+  static const String statChanges = "stat_changes";
 
   // Integers
   static const String id = "id";
@@ -162,29 +143,48 @@ class MoveFields {
   static const String accuracy = "accuracy";
   static const String priority = "priority";
   static const String effectChance = "effect_chance";
-  static const String statChanges = "stat_changes";
 
   // Foreign Keys
   static const String type = "type";
   static const String target = "target";
   static const String generation = "generation";
   static const String damageClass = "damage_class";
-  // static const String pokemon = "learned_by_pokemon";
 
   static const List<String> fields = [
     name,
     effect,
+    statChanges,
     id,
     pp,
     power,
     accuracy,
     priority,
     effectChance,
-    damageClass,
-    statChanges,
     type,
     target,
     generation,
+    damageClass,
     // pokemon,
   ];
 }
+
+const String moveMaker = """
+  CREATE TABLE $moveModel(
+    ${MoveFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${MoveFields.name} TEXT NOT NULL,
+    ${MoveFields.effect} TEXT NOT NULL,
+    ${MoveFields.statChanges} TEXT NOT NULL,
+    ${MoveFields.pp} INTEGER NOT NULL,
+    ${MoveFields.power} INTEGER NOT NULL,
+    ${MoveFields.accuracy} INTEGER NOT NULL,
+    ${MoveFields.priority} INTEGER NOT NULL,
+    ${MoveFields.effectChance} INTEGER NOT NULL,
+    ${MoveFields.type} INTEGER NOT NULL,
+    ${MoveFields.target} INTEGER NOT NULL,
+    ${MoveFields.generation} INTEGER NOT NULL,
+    ${MoveFields.damageClass} INTEGER NOT NULL,
+    FOREIGN KEY (${MoveFields.type}) REFERENCES $pkmnTypeModel (id),
+    FOREIGN KEY (${MoveFields.target}) REFERENCES $targetModel (id),
+    FOREIGN KEY (${MoveFields.generation}) REFERENCES $generationModel (id),
+    FOREIGN KEY (${MoveFields.damageClass}) REFERENCES $damageClassModel (id),
+  )""";
