@@ -32,7 +32,7 @@ extension API on DB {
 
     int i = 0;
     while (i < models.length && success == true) {
-      print(i);
+      print("Model#$i");
       success = success && await updateModel(models[i]);
       if (success) i++;
     }
@@ -42,10 +42,12 @@ extension API on DB {
 
   Future<bool> updateModel(String tableName) async {
     bool success = true;
-    print(tableName);
+    DB.instance.createTable(tableName);
+    print("Name: $tableName");
 
     try {
-      Response resp = await get(Uri.parse("$head/$tableName?$list"));
+      String type = tableName.replaceAll("_", "-");
+      Response resp = await get(Uri.parse("$head/$type?$list"));
 
       // Validate GET
       if (resp.statusCode == 200) {
@@ -75,7 +77,7 @@ extension API on DB {
   }
 
   Future<bool> updateRow(String tableName, String url) async {
-    bool success = false;
+    bool success = true;
     print("> $url");
 
     try {
@@ -94,14 +96,14 @@ extension API on DB {
           await upsert<Evolution>(tableName, Evolution.fromAPI(map));
         } else if (tableName == generationModel) {
           await upsert<Generation>(tableName, Generation.fromAPI(map));
-        } else if (tableName == generationModel) {
-          await upsert<Move>(tableName, Move.fromAPI(map));
         } else if (tableName == moveModel) {
-          await upsert<Typing>(tableName, Typing.fromAPI(map));
-        } else if (tableName == typingModel) {
-          await upsert<Species>(tableName, Species.fromAPI(map));
+          await upsert<Move>(tableName, Move.fromAPI(map));
         } else if (tableName == speciesModel) {
+          await upsert<Species>(tableName, Species.fromAPI(map));
+        } else if (tableName == targetModel) {
           await upsert<Target>(tableName, Target.fromAPI(map));
+        } else if (tableName == speciesModel) {
+          await upsert<Typing>(tableName, Typing.fromAPI(map));
         } else if (tableName == pokemonModel) {
           // Pokemon Model has special columns
 
@@ -128,6 +130,7 @@ extension API on DB {
       success = false;
     }
 
+    print("Done adding to $tableName!");
     return success;
   }
 

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import '_model.dart';
 
-const String evolutionModel = "evolution";
+const String evolutionModel = "evolution_chain";
 
 class Evolution implements Model {
   //----------------------------------------------------------------------------
@@ -44,6 +44,6 @@ class EvolutionFields {
 
 const String evolutionMaker = """
   CREATE TABLE $evolutionModel(
-    ${EvolutionFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${EvolutionFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${EvolutionFields.chain} TEXT NOT NULL
   )""";

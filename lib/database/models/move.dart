@@ -170,7 +170,7 @@ class MoveFields {
 
 const String moveMaker = """
   CREATE TABLE $moveModel(
-    ${MoveFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${MoveFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${MoveFields.name} TEXT NOT NULL,
     ${MoveFields.effect} TEXT NOT NULL,
     ${MoveFields.statChanges} TEXT NOT NULL,
@@ -186,5 +186,5 @@ const String moveMaker = """
     FOREIGN KEY (${MoveFields.type}) REFERENCES $typingModel (id),
     FOREIGN KEY (${MoveFields.target}) REFERENCES $targetModel (id),
     FOREIGN KEY (${MoveFields.generation}) REFERENCES $generationModel (id),
-    FOREIGN KEY (${MoveFields.damageClass}) REFERENCES $damageClassModel (id),
+    FOREIGN KEY (${MoveFields.damageClass}) REFERENCES $damageClassModel (id)
   )""";

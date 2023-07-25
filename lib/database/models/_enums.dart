@@ -1,9 +1,27 @@
 enum DamageClass { error, none, physical, special }
 
-// Map<DamageClass, String> damageClasses = {
+enum Generation {
+  error,
+  kanto,
+  johto,
+  hoenn,
+  sinnoh,
+  unova,
+  kalos,
+  alola,
+  galar,
+  paldea
+}
 
-// }
+enum GrowthRate {
+  error,
+  slow,
+  medium,
+  fast,
+  mediumSlow,
+  slowToFast,
+  fastToSlow
+}
 
-enum GrowthRate { error, slow, medium, fast, mediumSlow, slowToFast, fastToSlow }
+// enum Target {  }
 
-enum Stat { error, hp, attack, defense, specialAttack, specialDefense, speed }

@@ -33,51 +33,60 @@ class DB {
     db!.close();
   }
 
-  Future<int> insert<M extends Model>(String tableName, M item) async {
+  Future<bool> tableExists(String table) async {
+    final Database? db = await instance.database;
+    List<dynamic> tables =
+        await db!.query('sqlite_master', where: 'name = ?', whereArgs: [table]);
+
+    return tables.isNotEmpty;
+  }
+
+  Future<int> insert<M extends Model>(String table, M item) async {
     final Database? db = await instance.database;
     return await db!.insert(
-      tableName,
+      table,
       item.toDB(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<int> update<M extends Model>(String tableName, M item) async {
+  Future<int> update<M extends Model>(String table, M item) async {
     final Database? db = await instance.database;
     return await db!.update(
-      tableName,
+      table,
       item.toDB(),
       where: "id = ?",
       whereArgs: [item.getId()],
     );
   }
 
-  // Future<int> upsert(String tablename, Map<String, dynamic> json) async {
-  // final int id = await getById(tablename, json["id"] as int);
-  Future<int> upsert<M extends Model>(String tablename, M item) async {
-    final int id = await getById<M>(tablename, item.getId());
+  // Future<int> upsert(String table, Map<String, dynamic> json) async {
+  // final int id = await getById(table, json["id"] as int);
+  Future<int> upsert<M extends Model>(String table, M item) async {
+    final int id = await getById<M>(table, item.getId());
+    print(">>> UPSERT@$table: $id");
 
-    if (id >= 0) {
-      return await update(tablename, item);
+    if (id > 0) {
+      return await update(table, item);
     } else {
-      return await insert(tablename, item);
+      return await insert(table, item);
     }
   }
 
-  Future<int> delete<M extends Model>(String tableName, M item) async {
+  Future<int> delete<M extends Model>(String table, M item) async {
     final Database? db = await instance.database;
     return await db!.delete(
-      tableName,
+      table,
       where: "id = ?",
       whereArgs: [item.getId()],
     );
   }
 
-  Future getById<M extends Model>(String tableName, int id) async {
+  Future getById<M extends Model>(String table, int id) async {
     final Database? db = await instance.database;
 
     final query = await db!.query(
-      tableName,
+      table,
       where: "id = ?",
       whereArgs: [id],
       columns: Models.fields[M],
@@ -86,15 +95,16 @@ class DB {
     try {
       return Models.fromDB(query.first);
     } catch (err) {
-      throw Exception(err);
+      // throw Exception(err);
+      return 0;
     }
   }
 
-  Future<List> getAll<M extends Model>(String tableName) async {
+  Future<List> getAll<M extends Model>(String table) async {
     final Database? db = await instance.database;
 
     final query = await db!.query(
-      tableName,
+      table,
       orderBy: "ID ASC",
       columns: Models.fields[M],
     );
@@ -135,7 +145,7 @@ class DB {
     debugPrint("DB@: $filePath");
 
     return openDatabase(filePath,
-        onCreate: _onCreate, onConfigure: _onConfigure);
+        version: 1, onCreate: _onCreate, onConfigure: _onConfigure);
   }
 
   Future _onConfigure(Database db) async =>
@@ -143,8 +153,24 @@ class DB {
 
   Future _onCreate(Database db, int version) async {
     // Create TABLEs from Models
-    for (String maker in Models.makers) {
-      await db.execute(maker);
+
+    List<String> models = Models.models.keys.toList();
+
+    for (String table in models) {
+      await db.execute(table);
     }
+  }
+
+  // Debugging -----------------------------------------------------------------
+
+  Future<void> createTable(String table) async {
+    final Database? db = await instance.database;
+    bool exists = await tableExists(table);
+    if (!exists) db!.execute(Models.makers[table]!);
+  }
+
+  Future<void> dropTable(String table) async {
+    final Database? db = await instance.database;
+    await db!.execute("DROP TABLE IF EXISTS $table");
   }
 }

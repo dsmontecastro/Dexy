@@ -11,7 +11,7 @@ import 'target.dart';
 class Models {
   const Models();
 
-  // Get Model Names
+  // // Get Model Names
   static const String ability = abilityModel;
   static const String dmgClass = damageClassModel;
   static const String evolution = evolutionModel;
@@ -73,17 +73,17 @@ class Models {
   }
 
   // Get Table-creation Commands
-  static const List<String> makers = [
-    abilityMaker,
-    damageClassMaker,
-    evolutionMaker,
-    generationMaker,
-    moveMaker,
-    typingMaker,
-    pokemonMaker,
-    speciesMaker,
-    targetMaker
-  ];
+  static const Map<String, String> makers = {
+    evolutionModel: evolutionMaker,
+    generationModel: generationMaker,
+    damageClassModel: damageClassMaker,
+    targetModel: targetMaker,
+    typingModel: targetMaker,
+    abilityModel: abilityMaker,
+    moveModel: moveMaker,
+    pokemonModel: pokemonMaker,
+    speciesModel: speciesMaker,
+  };
 
   static const Map<Type, List<String>> fields = {
     Ability: AbilityFields.fields,
@@ -97,16 +97,17 @@ class Models {
     Target: TargetFields.fields,
   };
 
+  // Reordered for Foreign Keys
   static const Map<String, Type> models = {
-    abilityModel: Ability,
-    damageClassModel: DamageClass,
     evolutionModel: Evolution,
     generationModel: Generation,
-    moveModel: Move,
+    damageClassModel: DamageClass,
+    targetModel: Target,
     typingModel: Typing,
+    abilityModel: Ability,
+    moveModel: Move,
     pokemonModel: Pokemon,
     speciesModel: Species,
-    targetModel: Target,
   };
 }
 

@@ -1,6 +1,6 @@
 import '_model.dart';
 
-const String damageClassModel = "move-damage-class";
+const String damageClassModel = "move_damage_class";
 
 class DamageClass implements Model {
   //----------------------------------------------------------------------------
@@ -9,28 +9,32 @@ class DamageClass implements Model {
   int getId() => id;
 
   final int id;
+  final String name;
   final String description;
-  // image
 
   //----------------------------------------------------------------------------
 
   // Core Constructor
-  DamageClass({required this.id, required this.description});
+  DamageClass(
+      {required this.id, required this.name, required this.description});
 
   // JSON Parsing
   @override
   DamageClass.fromAPI(Map<String, dynamic> json)
       : id = json[DamageClassFields.id],
+        name = json[DamageClassFields.name],
         description = _getDescription(json);
 
   @override
   DamageClass.fromDB(Map<String, dynamic> json)
       : id = json[DamageClassFields.id],
+        name = json[DamageClassFields.name],
         description = json[DamageClassFields.description];
 
   @override
   Map<String, dynamic> toDB() => {
         DamageClassFields.id: id,
+        DamageClassFields.name: name,
         DamageClassFields.description: description,
       };
 
@@ -47,6 +51,8 @@ class DamageClassFields {
   const DamageClassFields();
 
   static const String id = "id";
+
+  static const String name = "name";
   static const String description = "description";
 
   static const List<String> fields = [id, description];
@@ -54,6 +60,7 @@ class DamageClassFields {
 
 const String damageClassMaker = """
   CREATE TABLE $damageClassModel(
-    ${DamageClassFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${DamageClassFields.id} INTEGER PRIMARY KEY NOT NULL,
+    ${DamageClassFields.name} TEXT NOT NULL,
     ${DamageClassFields.description} TEXT NOT NULL
   )""";

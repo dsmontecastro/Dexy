@@ -59,11 +59,13 @@ class Ability implements Model {
   static String _getEffect(Map<String, dynamic> json) {
     List<dynamic> effects = json["effect_entries"];
     Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
+    print(">> Effect: ${slot.first[AbilityFields.effect]}");
     return slot.first[AbilityFields.effect];
   }
 
   static int _getGeneration(Map<String, dynamic> json) {
     String url = json[AbilityFields.generation]["url"];
+    print(">> Generation: ${url.getId()}");
     return url.getId();
   }
 }
@@ -84,7 +86,7 @@ class AbilityFields {
 
 const String abilityMaker = """
   CREATE TABLE $abilityModel(
-    ${AbilityFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${AbilityFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${AbilityFields.name} TEXT NOT NULL,
     ${AbilityFields.effect} TEXT NOT NULL,
     ${AbilityFields.generation} INTEGER NOT NULL,

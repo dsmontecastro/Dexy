@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import '_model.dart';
+import '_classes.dart';
+
 import 'ability.dart';
 import 'typing.dart';
+import 'species.dart';
 
 import 'package:pokedex/extensions/string.dart';
-
-import 'species.dart';
 
 const String pokemonModel = "pokemon";
 
@@ -33,14 +34,6 @@ class Pokemon implements Model {
   final int weight;
   final int baseXP;
 
-  // Base Stats
-  final int hp;
-  final int attack;
-  final int defense;
-  final int specialAttack;
-  final int specialDefense;
-  final int speed;
-
   // Foreign Keys
   final int type1;
   final int type2;
@@ -49,10 +42,13 @@ class Pokemon implements Model {
   final int abilityH;
   final int species;
 
-  // Multiple Foreign Keys
-  final List<int> evs;
+  // List of Foreign Keys
   final List<int> heldItems;
   final List<Map<String, dynamic>> moves;
+
+  // Stat Modifiers
+  final Stats evs;
+  final Stats baseStats;
 
   //----------------------------------------------------------------------------
 
@@ -69,21 +65,16 @@ class Pokemon implements Model {
       required this.height,
       required this.weight,
       required this.baseXP,
-      required this.hp,
-      required this.attack,
-      required this.defense,
-      required this.specialAttack,
-      required this.specialDefense,
-      required this.speed,
       required this.type1,
       required this.type2,
       required this.ability1,
       required this.ability2,
       required this.abilityH,
       required this.species,
-      required this.evs,
       required this.moves,
-      required this.heldItems});
+      required this.heldItems,
+      required this.evs,
+      required this.baseStats});
 
   // Filler Constructor
   Pokemon.fill()
@@ -98,21 +89,16 @@ class Pokemon implements Model {
         height = 0,
         weight = 0,
         baseXP = 0,
-        hp = 0,
-        speed = 0,
-        attack = 0,
-        defense = 0,
-        specialAttack = 0,
-        specialDefense = 0,
         type1 = 0,
         type2 = 0,
         ability1 = 0,
         ability2 = 0,
         abilityH = 0,
         species = 0,
-        evs = [],
         heldItems = [],
-        moves = [];
+        moves = [],
+        evs = Stats.blank(),
+        baseStats = Stats.blank();
 
   // JSON Parsing
   @override
@@ -124,25 +110,20 @@ class Pokemon implements Model {
         image = json[PokemonFields.image],
         isDefault = json[PokemonFields.isDefault],
         id = json[PokemonFields.id],
-        order = json[PokemonFields.order],
+        order = json["order"], // problematic string in DB
         height = json[PokemonFields.height],
         weight = json[PokemonFields.weight],
         baseXP = json[PokemonFields.baseXP],
-        hp = json[0][PokemonFields.hp],
-        attack = json[1][PokemonFields.attack],
-        defense = json[2][PokemonFields.defense],
-        specialAttack = json[3][PokemonFields.specialAttack],
-        specialDefense = json[4][PokemonFields.specialDefense],
-        speed = json[5][PokemonFields.speed],
         type1 = _getType(json, 1),
         type2 = _getType(json, 2),
         ability1 = _getPokemon(json, 1),
         ability2 = _getPokemon(json, 2),
         abilityH = _getPokemon(json, 3),
         species = json[PokemonFields.species],
-        evs = _getEVs(json),
         heldItems = _getHeldItems(json),
-        moves = _getMoves(json);
+        moves = _getMoves(json),
+        evs = _getStats(json, PokemonFields.evs),
+        baseStats = _getStats(json, PokemonFields.baseStats);
 
   @override
   Pokemon.fromDB(Map<String, dynamic> json)
@@ -157,21 +138,16 @@ class Pokemon implements Model {
         height = json[PokemonFields.height],
         weight = json[PokemonFields.weight],
         baseXP = json[PokemonFields.baseXP],
-        hp = json[PokemonFields.hp],
-        speed = json[PokemonFields.speed],
-        attack = json[PokemonFields.attack],
-        defense = json[PokemonFields.defense],
-        specialAttack = json[PokemonFields.specialAttack],
-        specialDefense = json[PokemonFields.specialDefense],
         type1 = json[PokemonFields.type1],
         type2 = json[PokemonFields.type2],
         ability1 = json[PokemonFields.ability1],
         ability2 = json[PokemonFields.abilityH],
         abilityH = json[PokemonFields.abilityH],
         species = json[PokemonFields.species],
-        evs = (json[PokemonFields.evs] as String).toListInt(),
         heldItems = (json[PokemonFields.heldItems] as String).toListInt(),
-        moves = _getMovesFromDB(json[PokemonFields.moves]);
+        moves = _getMovesFromDB(json[PokemonFields.moves]),
+        evs = Stats.fromList(json[PokemonFields.evs]),
+        baseStats = Stats.fromList(json[PokemonFields.baseStats]);
 
   @override
   Map<String, dynamic> toDB() => {
@@ -186,34 +162,23 @@ class Pokemon implements Model {
         PokemonFields.height: height,
         PokemonFields.weight: weight,
         PokemonFields.baseXP: baseXP,
-        PokemonFields.hp: hp,
-        PokemonFields.speed: speed,
-        PokemonFields.attack: attack,
-        PokemonFields.defense: defense,
-        PokemonFields.specialAttack: specialAttack,
-        PokemonFields.specialDefense: specialDefense,
         PokemonFields.type1: type1,
         PokemonFields.type2: type2,
         PokemonFields.ability1: ability1,
         PokemonFields.ability2: ability2,
         PokemonFields.abilityH: abilityH,
         PokemonFields.species: species,
-        PokemonFields.evs: evs.join(separator),
         PokemonFields.moves: moves.join(separator),
         PokemonFields.heldItems: heldItems.join(separator),
+        PokemonFields.evs: evs.toString(),
+        PokemonFields.baseStats: baseStats.toString(),
       };
 
   // Helper Functions
-  static List<int> _getEVs(Map<String, dynamic> json) =>
-      [for (final stat in json["stats"]) stat["effort"] as int];
-  //  {
-  //   List<int> evs = List.filled(Stat.values.length, 0);
-  //   List<Map> stats = json["stats"];
-
-  //   for (int i = 0; i < stats.length; i++) {
-  //     evs[i] = int.parse(stats[i]["effort"]);
-  //   }
-  // }
+  static Stats _getStats(Map<String, dynamic> json, String type) {
+    List<int> stats = [for (final stat in json["stats"]) stat[type] as int];
+    return Stats.fromList(stats);
+  }
 
   static int _getType(Map<String, dynamic> json, int index) {
     List<Map> types = json["types"];
@@ -257,17 +222,7 @@ class Pokemon implements Model {
 
   static List<Map<String, dynamic>> _getMovesFromDB(String encoded) {
     List<String> jsons = encoded.split(separator);
-    return jsons
-        .map((json) => jsonDecode(json) as Map<String, dynamic>)
-        .toList();
-    // List<Map<String, dynamic>> moves = [];
-
-    // for (final json in jsons) {
-    //   Map<String, dynamic> move = jsonDecode(json);
-    //   moves.add(move);
-    // }
-
-    // return moves;
+    return jsons.map((j) => jsonDecode(j) as Map<String, dynamic>).toList();
   }
 }
 
@@ -286,33 +241,26 @@ class PokemonFields {
 
   // Standard Integers
   static const String id = "id";
-  static const String order = "order";
+  static const String order = "ordera";
   static const String height = "height";
   static const String weight = "weight";
   static const String baseXP = "base_experience";
   static const String species = "species";
 
-  // Base Stats
-  static const String baseStat = "base_stat"; // Not a column
-
-  static const String hp = "hp";
-  static const String speed = "speed";
-  static const String attack = "attack";
-  static const String defense = "defense";
-  static const String specialAttack = "special-attack";
-  static const String specialDefense = "special-defense";
-  static const String evs = "evs";
-
   // Foreign Keys
-  static const String type1 = "type-1";
-  static const String type2 = "type-2";
-  static const String ability1 = "ability-1";
-  static const String ability2 = "ability-2";
-  static const String abilityH = "ability-hidden";
+  static const String type1 = "type_1";
+  static const String type2 = "type_2";
+  static const String ability1 = "ability_1";
+  static const String ability2 = "ability_2";
+  static const String abilityH = "ability_hidden";
 
   // Multiple Foreign Keys
   static const String moves = "moves";
   static const String heldItems = "held_items";
+
+  // Base Stats
+  static const String evs = "effort";
+  static const String baseStats = "base_stat";
 
   // List of All Fields
   static const List<String> fields = [
@@ -327,27 +275,22 @@ class PokemonFields {
     height,
     weight,
     baseXP,
-    hp,
-    speed,
-    attack,
-    defense,
-    specialAttack,
-    specialDefense,
     type1,
     type2,
     ability1,
     ability2,
     abilityH,
     species,
-    evs,
     moves,
     heldItems,
+    evs,
+    baseStats,
   ];
 }
 
 const String pokemonMaker = """
   CREATE TABLE $pokemonModel(
-    ${PokemonFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${PokemonFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${PokemonFields.name} TEXT NOT NULL,
     ${PokemonFields.icon} TEXT NOT NULL,
     ${PokemonFields.image} TEXT NOT NULL,
@@ -358,22 +301,16 @@ const String pokemonMaker = """
     ${PokemonFields.height} INTEGER NOT NULL,
     ${PokemonFields.weight} INTEGER NOT NULL,
     ${PokemonFields.baseXP} INTEGER NOT NULL,
-    ${PokemonFields.hp} INTEGER NOT NULL,
-    ${PokemonFields.speed} INTEGER NOT NULL,
-    ${PokemonFields.attack} INTEGER NOT NULL,
-    ${PokemonFields.defense} INTEGER NOT NULL,
-    ${PokemonFields.specialAttack} INTEGER NOT NULL,
-    ${PokemonFields.specialDefense} INTEGER NOT NULL,
-    ${PokemonFields.speed} INTEGER NOT NULL,
     ${PokemonFields.type1} INTEGER NOT NULL,
     ${PokemonFields.type2} INTEGER NOT NULL,
     ${PokemonFields.ability1} INTEGER NOT NULL,
     ${PokemonFields.ability2} INTEGER NOT NULL,
     ${PokemonFields.abilityH} INTEGER NOT NULL,
     ${PokemonFields.species} INTEGER NOT NULL,
-    ${PokemonFields.evs} TEXT NOT NULL,
     ${PokemonFields.moves} TEXT NOT NULL,
     ${PokemonFields.heldItems} TEXT NOT NULL,
+    ${PokemonFields.evs} TEXT NOT NULL,
+    ${PokemonFields.baseStats} TEXT NOT NULL,
     FOREIGN KEY (${PokemonFields.type1}) REFERENCES $typingModel (id),
     FOREIGN KEY (${PokemonFields.type2}) REFERENCES $typingModel (id),
     FOREIGN KEY (${PokemonFields.ability1}) REFERENCES $abilityModel (id),

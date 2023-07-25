@@ -55,7 +55,7 @@ class GenerationFields {
 
 const String generationMaker = """
   CREATE TABLE $generationModel(
-    ${GenerationFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${GenerationFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${GenerationFields.name} TEXT NOT NULL,
     ${GenerationFields.region} TEXT NOT NULL
   )""";

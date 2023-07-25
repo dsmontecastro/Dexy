@@ -1,6 +1,8 @@
+import 'package:pokedex/extensions/string.dart';
+
 import '_model.dart';
 
-const String targetModel = "target";
+const String targetModel = "move_target";
 
 class Target implements Model {
   //----------------------------------------------------------------------------
@@ -10,7 +12,6 @@ class Target implements Model {
 
   final int id;
   final String description;
-  // image
 
   //----------------------------------------------------------------------------
 
@@ -35,9 +36,14 @@ class Target implements Model {
   // Helper Functions
   static String _getDescription(Map<String, dynamic> json) {
     List<dynamic> descriptions = json["descriptions"];
-    Iterable slot =
-        descriptions.where((slot) => slot["language"]["name"] == "en");
-    return slot.first[TargetFields.description];
+
+    if (descriptions.isEmpty) {
+      return (json["name"].toString()).capitalize(pattern: '-');
+    } else {
+      Iterable slot =
+          descriptions.where((slot) => slot["language"]["name"] == "en");
+      return slot.first[TargetFields.description];
+    }
   }
 }
 
@@ -52,6 +58,6 @@ class TargetFields {
 
 const String targetMaker = """
   CREATE TABLE $targetModel(
-    ${TargetFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${TargetFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${TargetFields.description} TEXT NOT NULL
   )""";

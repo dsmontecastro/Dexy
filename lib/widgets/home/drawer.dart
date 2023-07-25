@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:pokedex/extensions/provider.dart';
+import 'package:pokedex/database/models/_model.dart';
 
 const Icon back = Icon(Icons.arrow_back);
 const Icon load = Icon(Icons.refresh);
@@ -27,7 +28,9 @@ class CustomDrawer extends StatelessWidget {
           IconButton(
             icon: load,
             alignment: Alignment.bottomLeft,
-            onPressed: () => context.dex.callAPI(),
+            // onPressed: () => context.dex.callAPI(),
+            onPressed: () => context.dex.callAPI(table: Models.target),
+            // onPressed: () => context.dex.drop(Models.typing),
           ),
         ],
       ),
@@ -40,6 +43,6 @@ class DrawerMenu extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return Expanded(child: Column());
+    return const Expanded(child: Column());
   }
 }

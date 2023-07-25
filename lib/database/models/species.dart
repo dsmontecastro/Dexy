@@ -4,7 +4,7 @@ import 'generation.dart';
 
 import 'package:pokedex/extensions/string.dart';
 
-const String speciesModel = "pokemon-species";
+const String speciesModel = "pokemon_species";
 
 class Species implements Model {
   //----------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class Species implements Model {
         isMythical = json[SpeciesFields.isMythical],
         isBaby = json[SpeciesFields.isBaby],
         id = json[SpeciesFields.id],
-        order = json[SpeciesFields.order],
+        order = json["order"], // problematic string in DB
         happiness = json[SpeciesFields.happiness],
         catchRate = json[SpeciesFields.catchRate],
         genderRate = json[SpeciesFields.genderRate],
@@ -168,15 +168,15 @@ class SpeciesFields {
 
   // Integers
   static const id = "id";
-  static const order = "order";
+  static const order = "ordera";
   static const happiness = "base_happiness";
   static const catchRate = "capture_rate";
   static const genderRate = "gender_rate";
 
   // Foreign Keys
-  static const evolutions = "Evolutions";
-  static const generation = "Generation";
-  static const varieties = "Varieties";
+  static const evolutions = "evolutions";
+  static const generation = "generation";
+  static const varieties = "varieties";
 
   // List of All Fields
   static const List<String> fields = [
@@ -202,7 +202,7 @@ class SpeciesFields {
 
 const String speciesMaker = """
   CREATE TABLE $speciesModel(
-    ${SpeciesFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${SpeciesFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${SpeciesFields.name} TEXT NOT NULL,
     ${SpeciesFields.text} TEXT NOT NULL,
     ${SpeciesFields.genus} TEXT NOT NULL,

@@ -13,4 +13,10 @@ extension MoreStrings on String {
     List<String> list = split(pattern);
     return list.map(int.parse).toList();
   }
+
+  String capitalize({Pattern pattern = separator}) {
+    List<String> list = split(pattern);
+    list.map((e) => e[0].toUpperCase());
+    return list.toString();
+  }
 }

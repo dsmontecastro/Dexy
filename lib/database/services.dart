@@ -57,18 +57,18 @@ class Dex with ChangeNotifier {
   bool _loaded = false;
   bool get isLoaded => _loaded;
 
-  Future<void> init() async {
-    if (!_loaded) {
-      bool success = await callAPI();
-      if (success) _loaded = true;
-    }
-  }
-
-  Future<bool> callAPI() async {
+  Future<bool> callAPI({String table = ""}) async {
     bool success = true;
 
     if (!_loaded) {
-      bool flag = await DB.instance.updateAll();
+      bool flag = false;
+
+      if (table == "") {
+        flag = await DB.instance.updateAll();
+      } else {
+        flag = await DB.instance.updateModel(table);
+      }
+
       if (flag) {
         _loaded = true;
         success = await fillResources();
@@ -178,4 +178,8 @@ class Dex with ChangeNotifier {
       return false;
     }
   }
+
+  // [TEMP] Debugging ----------------------------------------------------------
+
+  Future<void> drop(String table) => DB.instance.dropTable(table);
 }

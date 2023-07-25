@@ -2,7 +2,7 @@ import '_model.dart';
 
 import 'package:pokedex/extensions/string.dart';
 
-const String typingModel = "typing";
+const String typingModel = "type";
 
 class Typing implements Model {
   //----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ class TypingFields {
 
 const String typingMaker = """
   CREATE TABLE $typingModel(
-    ${TypingFields.id} INTEGER PRIMARY KET NOT NULL,
+    ${TypingFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${TypingFields.name} TEXT NOT NULL,
     ${TypingFields.noTo} TEXT NOT NULL,
     ${TypingFields.noFrom} TEXT NOT NULL,
