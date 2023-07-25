@@ -1,6 +1,6 @@
 import '_model.dart';
 import 'target.dart';
-import 'pkmn_type.dart';
+import 'typing.dart';
 import 'generation.dart';
 import 'damage_class.dart';
 
@@ -103,7 +103,7 @@ class Move implements Model {
 
   // Helper Functions
   static String _getEffect(Map<String, dynamic> json) {
-    List<Map> effects = json["effect_entries"];
+    List<dynamic> effects = json["effect_entries"];
     Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
     return slot.first[MoveFields.effect];
   }
@@ -183,7 +183,7 @@ const String moveMaker = """
     ${MoveFields.target} INTEGER NOT NULL,
     ${MoveFields.generation} INTEGER NOT NULL,
     ${MoveFields.damageClass} INTEGER NOT NULL,
-    FOREIGN KEY (${MoveFields.type}) REFERENCES $pkmnTypeModel (id),
+    FOREIGN KEY (${MoveFields.type}) REFERENCES $typingModel (id),
     FOREIGN KEY (${MoveFields.target}) REFERENCES $targetModel (id),
     FOREIGN KEY (${MoveFields.generation}) REFERENCES $generationModel (id),
     FOREIGN KEY (${MoveFields.damageClass}) REFERENCES $damageClassModel (id),

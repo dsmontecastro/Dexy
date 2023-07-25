@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home/_home.dart';
+
 import 'body.dart';
+import 'home/appbar.dart';
+import 'home/drawer.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -28,13 +30,15 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final double width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      key: drawerKey,
-      body: body(searchController),
-      drawer: drawer(draw, screenWidth),
-      appBar: appBar(draw, searchController),
+    return MaterialApp(
+      home: Scaffold(
+        key: drawerKey,
+        body: const Body(),
+        appBar: appBar(draw),
+        drawer: CustomDrawer(draw, width),
+      ),
     );
   }
 }

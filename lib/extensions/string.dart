@@ -5,7 +5,8 @@ extension MoreStrings on String {
 
   int getId() {
     List<String> list = split("/");
-    return int.parse(list[-1]);
+    int len = list.length - 2;
+    return int.parse(list[len]);
   }
 
   List<int> toListInt({Pattern pattern = separator}) {

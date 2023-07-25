@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:pokedex/extensions/provider.dart';
+
 const String logoPath = "assets/images/logo.svg";
 
-AppBar homeAppBar(
-  Function draw,
-  TextEditingController searchController,
-) {
+AppBar appBar(Function draw) {
   return AppBar(
     // Title: Search Bar
-    title: SearchBar(controller: searchController),
+    title: const SearchBar(),
     titleSpacing: 5.0,
 
     // Lead: App Icon
@@ -24,8 +23,7 @@ AppBar homeAppBar(
 }
 
 class SearchBar extends StatelessWidget {
-  const SearchBar({super.key, required this.controller});
-  final TextEditingController controller;
+  const SearchBar({super.key});
 
   static final Color fillColor = Colors.grey.shade600;
   static final Color textColor = Colors.red.shade600;
@@ -38,29 +36,47 @@ class SearchBar extends StatelessWidget {
   @override
   Widget build(context) {
     return SizedBox(
-        height: 35,
+        height: 50,
         child: Padding(
           padding: const EdgeInsets.only(right: 15.0),
-          child: TextField(
-            controller: controller,
-            cursorColor: textColor,
-            keyboardType: TextInputType.text,
-            textAlignVertical: TextAlignVertical.center,
-            decoration: InputDecoration(
-              hintText: "Search...",
-              filled: true,
-              fillColor: fillColor,
-              prefixIcon: prefixIcon,
-              border: UnderlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onSubmitted: (text) {
-              // Navigator.pushNamed(context, Routes.search, arguments: {text: controller.text});
-              // print(controller.text);
-            },
-          ),
+          child: SearchField(),
         ));
+  }
+}
+
+class SearchField extends StatelessWidget {
+  SearchField({super.key});
+
+  final TextEditingController controller = TextEditingController();
+
+  static final Color fillColor = Colors.grey.shade600;
+  static final Color textColor = Colors.red.shade600;
+
+  static final Icon prefixIcon = Icon(
+    Icons.search,
+    color: textColor,
+  );
+
+  static final InputDecoration decor = InputDecoration(
+    filled: true,
+    fillColor: fillColor,
+    hintText: "Search...",
+    prefixIcon: prefixIcon,
+    border: UnderlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(10),
+    ),
+  );
+
+  @override
+  Widget build(context) {
+    return TextField(
+      decoration: decor,
+      controller: controller,
+      cursorColor: textColor,
+      keyboardType: TextInputType.text,
+      textAlignVertical: TextAlignVertical.center,
+      onSubmitted: (text) => context.dex.filter(text),
+    );
   }
 }

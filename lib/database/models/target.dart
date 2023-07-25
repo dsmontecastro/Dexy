@@ -34,8 +34,9 @@ class Target implements Model {
 
   // Helper Functions
   static String _getDescription(Map<String, dynamic> json) {
-    List<Map> descriptions = json["descriptions"];
-    Iterable slot = descriptions.where((slot) => slot["language"]["name"] == "en");
+    List<dynamic> descriptions = json["descriptions"];
+    Iterable slot =
+        descriptions.where((slot) => slot["language"]["name"] == "en");
     return slot.first[TargetFields.description];
   }
 }

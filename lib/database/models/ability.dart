@@ -57,7 +57,7 @@ class Ability implements Model {
 
   // Helper Functions
   static String _getEffect(Map<String, dynamic> json) {
-    List<Map> effects = json["effect_entries"];
+    List<dynamic> effects = json["effect_entries"];
     Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
     return slot.first[AbilityFields.effect];
   }

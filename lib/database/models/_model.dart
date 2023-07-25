@@ -2,7 +2,7 @@ import 'ability.dart';
 import 'damage_class.dart';
 import 'evolution.dart';
 import 'generation.dart';
-import 'pkmn_type.dart';
+import 'typing.dart';
 import 'move.dart';
 import 'pokemon.dart';
 import 'species.dart';
@@ -17,7 +17,7 @@ class Models {
   static const String evolution = evolutionModel;
   static const String generation = generationModel;
   static const String move = moveModel;
-  static const String pkmnType = pkmnTypeModel;
+  static const String typing = typingModel;
   static const String pokemon = pokemonModel;
   static const String species = speciesModel;
   static const String target = targetModel;
@@ -34,8 +34,8 @@ class Models {
       return Generation.fromAPI(json) as T;
     } else if (T == Move) {
       return Move.fromAPI(json) as T;
-    } else if (T == PkmnType) {
-      return PkmnType.fromAPI(json) as T;
+    } else if (T == Typing) {
+      return Typing.fromAPI(json) as T;
     } else if (T == Pokemon) {
       return Pokemon.fromAPI(json) as T;
     } else if (T == Species) {
@@ -59,8 +59,8 @@ class Models {
       return Generation.fromDB(json) as T;
     } else if (T == Move) {
       return Move.fromDB(json) as T;
-    } else if (T == PkmnType) {
-      return PkmnType.fromDB(json) as T;
+    } else if (T == Typing) {
+      return Typing.fromDB(json) as T;
     } else if (T == Pokemon) {
       return Pokemon.fromDB(json) as T;
     } else if (T == Species) {
@@ -79,7 +79,7 @@ class Models {
     evolutionMaker,
     generationMaker,
     moveMaker,
-    pkmnTypeMaker,
+    typingMaker,
     pokemonMaker,
     speciesMaker,
     targetMaker
@@ -91,7 +91,7 @@ class Models {
     Evolution: EvolutionFields.fields,
     Generation: GenerationFields.fields,
     Move: MoveFields.fields,
-    PkmnType: PkmnTypeFields.fields,
+    Typing: TypingFields.fields,
     Pokemon: PokemonFields.fields,
     Species: SpeciesFields.fields,
     Target: TargetFields.fields,
@@ -103,7 +103,7 @@ class Models {
     evolutionModel: Evolution,
     generationModel: Generation,
     moveModel: Move,
-    pkmnTypeModel: PkmnType,
+    typingModel: Typing,
     pokemonModel: Pokemon,
     speciesModel: Species,
     targetModel: Target,

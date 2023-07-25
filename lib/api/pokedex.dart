@@ -7,9 +7,10 @@ class Pokedex {
   // Global Pokedex Class
 
   // Constants
-  static const int tryLimit = 1000;
+  static const int tryLimit = 1;
   static const String prefKey = "pokedex";
-  static const String link = "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0";
+  static const String link =
+      "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0";
 
   // Variables
   static List<Pokemon> _pokedex = [];
@@ -19,11 +20,12 @@ class Pokedex {
   static Future<List<Pokemon>> init() async {
     List<String>? list = SharedPrefs.getStringList(prefKey);
     if (list != null) {
-      _pokedex = list.map((json) => Pokemon.fromJson(jsonDecode(json))).toList();
+      _pokedex =
+          list.map((json) => Pokemon.fromJson(jsonDecode(json))).toList();
     } else {
       int tries = 0;
       bool success = await update();
-      while (!success || tries < tryLimit) {
+      while (!success && tries < tryLimit) {
         success = await update();
         tries++;
       }

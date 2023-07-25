@@ -132,12 +132,14 @@ class DB {
   Future<Database> _init(String fileName) async {
     final String dbPath = await getDatabasesPath();
     final String filePath = path.join(dbPath + fileName);
-    debugPrint(filePath);
+    debugPrint("DB@: $filePath");
 
-    return openDatabase(filePath, onCreate: _onCreate, onConfigure: _onConfigure);
+    return openDatabase(filePath,
+        onCreate: _onCreate, onConfigure: _onConfigure);
   }
 
-  Future _onConfigure(Database db) async => await db.execute("PRAGMA foreign_keys = ON");
+  Future _onConfigure(Database db) async =>
+      await db.execute("PRAGMA foreign_keys = ON");
 
   Future _onCreate(Database db, int version) async {
     // Create TABLEs from Models

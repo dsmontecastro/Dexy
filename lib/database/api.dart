@@ -8,7 +8,7 @@ import 'models/ability.dart';
 import 'models/damage_class.dart';
 import 'models/evolution.dart';
 import 'models/generation.dart';
-import 'models/pkmn_type.dart';
+import 'models/typing.dart';
 import 'models/move.dart';
 import 'models/pokemon.dart';
 import 'models/species.dart';
@@ -20,11 +20,12 @@ extension API on DB {
   // API Calls for Updating the DB
 
   // Constants
-  static const int tryLimit = 100;
+  static const int tryLimit = 1;
   static const String list = "limit=100000&offset=0";
   static const String head = "https://pokeapi.co/api/v2";
 
   // API Methods
+
   Future<bool> updateAll() async {
     bool success = true;
     List<String> models = Models.models.keys.toList();
@@ -83,7 +84,6 @@ extension API on DB {
       // Validate GET
       if (resp.statusCode == 200) {
         Map<String, dynamic> map = jsonDecode(resp.body);
-        // maps.cast<List<Map<String, dynamic>>>();
         print("> ID: ${map["id"]}");
 
         if (tableName == abilityModel) {
@@ -97,8 +97,8 @@ extension API on DB {
         } else if (tableName == generationModel) {
           await upsert<Move>(tableName, Move.fromAPI(map));
         } else if (tableName == moveModel) {
-          await upsert<PkmnType>(tableName, PkmnType.fromAPI(map));
-        } else if (tableName == pkmnTypeModel) {
+          await upsert<Typing>(tableName, Typing.fromAPI(map));
+        } else if (tableName == typingModel) {
           await upsert<Species>(tableName, Species.fromAPI(map));
         } else if (tableName == speciesModel) {
           await upsert<Target>(tableName, Target.fromAPI(map));
@@ -111,8 +111,10 @@ extension API on DB {
           map[PokemonFields.caught] = pokemon.caught;
 
           // Get & Convert Sprites
-          String iconURL = map["sprites"]["versions"]["generation-viii"]["front_default"];
-          String imageURL = map["sprites"]["other"]["official-artwork"]["front_default"];
+          String iconURL =
+              map["sprites"]["versions"]["generation-viii"]["front_default"];
+          String imageURL =
+              map["sprites"]["other"]["official-artwork"]["front_default"];
           map[PokemonFields.icon] = await updateSprite(iconURL);
           map[PokemonFields.image] = await updateSprite(imageURL);
 
@@ -151,7 +153,8 @@ extension API on DB {
 
     for (int i = 0; i < jsons.length; i++) {
       Map json = jsons[i];
-      json.map((key, value) => MapEntry(key as String, value as Map<String, String>));
+      json.map((key, value) =>
+          MapEntry(key as String, value as Map<String, String>));
       results.add(json as Result);
     }
 

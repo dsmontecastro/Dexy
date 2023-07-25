@@ -123,8 +123,9 @@ class Species implements Model {
       };
 
   // Helper Functions
-  static String _getLang(Map<String, dynamic> json, String field, String subfield) {
-    List<Map> types = json["types"];
+  static String _getLang(
+      Map<String, dynamic> json, String field, String subfield) {
+    List<dynamic> types = json["types"];
     Iterable slot = types.where((slot) => slot["language"]["name"] == "en");
     return slot.first[field];
   }

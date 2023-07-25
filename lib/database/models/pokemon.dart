@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import '_model.dart';
 import 'ability.dart';
-import 'pkmn_type.dart';
+import 'typing.dart';
 
 import 'package:pokedex/extensions/string.dart';
 
@@ -84,6 +84,35 @@ class Pokemon implements Model {
       required this.evs,
       required this.moves,
       required this.heldItems});
+
+  // Filler Constructor
+  Pokemon.fill()
+      : name = "---",
+        icon = "-",
+        image = "-",
+        isDefault = false,
+        favorite = false,
+        caught = false,
+        id = 0,
+        order = 0,
+        height = 0,
+        weight = 0,
+        baseXP = 0,
+        hp = 0,
+        speed = 0,
+        attack = 0,
+        defense = 0,
+        specialAttack = 0,
+        specialDefense = 0,
+        type1 = 0,
+        type2 = 0,
+        ability1 = 0,
+        ability2 = 0,
+        abilityH = 0,
+        species = 0,
+        evs = [],
+        heldItems = [],
+        moves = [];
 
   // JSON Parsing
   @override
@@ -228,7 +257,9 @@ class Pokemon implements Model {
 
   static List<Map<String, dynamic>> _getMovesFromDB(String encoded) {
     List<String> jsons = encoded.split(separator);
-    return jsons.map((json) => jsonDecode(json) as Map<String, dynamic>).toList();
+    return jsons
+        .map((json) => jsonDecode(json) as Map<String, dynamic>)
+        .toList();
     // List<Map<String, dynamic>> moves = [];
 
     // for (final json in jsons) {
@@ -343,8 +374,8 @@ const String pokemonMaker = """
     ${PokemonFields.evs} TEXT NOT NULL,
     ${PokemonFields.moves} TEXT NOT NULL,
     ${PokemonFields.heldItems} TEXT NOT NULL,
-    FOREIGN KEY (${PokemonFields.type1}) REFERENCES $pkmnTypeModel (id),
-    FOREIGN KEY (${PokemonFields.type2}) REFERENCES $pkmnTypeModel (id),
+    FOREIGN KEY (${PokemonFields.type1}) REFERENCES $typingModel (id),
+    FOREIGN KEY (${PokemonFields.type2}) REFERENCES $typingModel (id),
     FOREIGN KEY (${PokemonFields.ability1}) REFERENCES $abilityModel (id),
     FOREIGN KEY (${PokemonFields.ability2}) REFERENCES $abilityModel (id),
     FOREIGN KEY (${PokemonFields.abilityH}) REFERENCES $abilityModel (id),
