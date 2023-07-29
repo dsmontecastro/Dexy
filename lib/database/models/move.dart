@@ -1,10 +1,11 @@
 import '_model.dart';
-import 'target.dart';
-import 'typing.dart';
-import 'generation.dart';
-import 'damage_class.dart';
 
 import 'package:pokedex/extensions/string.dart';
+import 'package:pokedex/types/enums/damage.dart';
+import 'package:pokedex/types/enums/target.dart';
+import 'package:pokedex/types/enums/typing.dart';
+import 'package:pokedex/types/enums/generation.dart';
+import 'package:pokedex/types/classes/stats.dart';
 
 const String moveModel = "move";
 
@@ -21,17 +22,17 @@ class Move implements Model {
   // Integers
   final int id;
   final int pp;
-  final int power;
-  final int accuracy;
-  final int priority;
-  final int effectChance;
-  final List<int> statChanges;
+  final int? power;
+  final int? accuracy;
+  final int? priority;
+  final int? effectChance;
 
-  // Foreign Keys
-  final int type;
-  final int target;
-  final int generation;
-  final int damageClass;
+  // ENUM Keys
+  final Typing type;
+  final Target target;
+  final Generation generation;
+  final DamageClass damageClass;
+  final Stats statChanges;
 
   //----------------------------------------------------------------------------
 
@@ -51,21 +52,36 @@ class Move implements Model {
       required this.damageClass,
       required this.statChanges});
 
+  Move.filler()
+      : name = blank,
+        effect = blank,
+        id = 0,
+        pp = 0,
+        power = null,
+        accuracy = null,
+        priority = null,
+        effectChance = null,
+        type = Typing.error,
+        target = Target.error,
+        generation = Generation.error,
+        damageClass = DamageClass.error,
+        statChanges = Stats.blank();
+
   // JSON Parsing
   @override
   Move.fromAPI(Map<String, dynamic> json)
       : name = json[MoveFields.name],
         effect = _getEffect(json),
         id = json[MoveFields.id],
-        pp = json[MoveFields.pp],
+        pp = json[MoveFields.pp] ?? 0,
         power = json[MoveFields.power],
         accuracy = json[MoveFields.pp],
         priority = json[MoveFields.priority],
         effectChance = json[MoveFields.effectChance],
-        type = _getById(json, MoveFields.type),
-        target = _getById(json, MoveFields.target),
-        generation = _getById(json, MoveFields.generation),
-        damageClass = _getById(json, MoveFields.damageClass),
+        type = Typing.values[_getById(json, MoveFields.type)],
+        target = Target.values[_getById(json, MoveFields.target)],
+        generation = Generation.values[_getById(json, MoveFields.generation)],
+        damageClass = DamageClass.values[_getById(json, MoveFields.damageClass)],
         statChanges = _getStatChanges(json);
 
   @override
@@ -78,11 +94,11 @@ class Move implements Model {
         accuracy = json[MoveFields.pp],
         priority = json[MoveFields.priority],
         effectChance = json[MoveFields.effectChance],
-        type = json[MoveFields.type],
-        target = json[MoveFields.target],
-        generation = json[MoveFields.generation],
-        damageClass = json[MoveFields.damageClass],
-        statChanges = (json[MoveFields.statChanges] as String).toListInt();
+        type = Typing.values[json[MoveFields.type]],
+        target = Target.values[json[MoveFields.target]],
+        generation = Generation.values[json[MoveFields.generation]],
+        damageClass = DamageClass.values[json[MoveFields.damageClass]],
+        statChanges = Stats.fromString(json[MoveFields.statChanges]);
 
   @override
   Map<String, dynamic> toDB() => {
@@ -94,37 +110,62 @@ class Move implements Model {
         MoveFields.accuracy: accuracy,
         MoveFields.priority: priority,
         MoveFields.effectChance: effectChance,
-        MoveFields.type: type,
-        MoveFields.target: target,
-        MoveFields.generation: generation,
-        MoveFields.damageClass: damageClass,
-        MoveFields.statChanges: statChanges.join(separator)
+        MoveFields.type: type.index,
+        MoveFields.target: target.index,
+        MoveFields.generation: generation.index,
+        MoveFields.damageClass: damageClass.index,
+        MoveFields.statChanges: statChanges.toString()
       };
 
   // Helper Functions
-  static String _getEffect(Map<String, dynamic> json) {
-    List<dynamic> effects = json["effect_entries"];
-    Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
-    return slot.first[MoveFields.effect];
+  static int _getById(Map<String, dynamic> json, String field) {
+    String url = json[field]["url"];
+    int id = url.getId();
+
+    // Special Conversion for Irregular Types
+    if (field == MoveFields.type) {
+      if (id == 10001) {
+        id = 0;
+      } else if (id == 10002) {
+        id = 20;
+      }
+    }
+
+    return id;
   }
 
-  static List<int> _getStatChanges(Map<String, dynamic> json) {
-    List<Map> maps = json[MoveFields.statChanges];
-    List<int> changes = List.filled(6, 0);
+  static String _getEffect(Map<String, dynamic> json) {
+    List<dynamic> effects = json["effect_entries"] ?? [];
+    String field = MoveFields.effect;
+
+    if (effects.isEmpty) {
+      effects = json["flavor_text_entries"];
+      field = "flavor_text";
+    }
+
+    String? text;
+    if (effects.isNotEmpty) {
+      Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
+      text = slot.first[field];
+    }
+
+    return text ?? blank;
+  }
+
+  static Stats _getStatChanges(Map<String, dynamic> json) {
+    List<dynamic> maps = json[MoveFields.statChanges];
+
+    if (maps.isEmpty) return Stats.blank();
+
+    List<int> changes = List.filled(Stats.count, 0);
 
     for (final map in maps) {
       String url = map["stat"]["url"];
       int stat = url.getId() - 1;
-
-      changes[stat] = map["chance"];
+      changes[stat] = map["change"];
     }
 
-    return changes;
-  }
-
-  static int _getById(Map<String, dynamic> json, String field) {
-    String url = json[field]["url"];
-    return url.getId();
+    return Stats.fromList(changes);
   }
 }
 
@@ -134,7 +175,6 @@ class MoveFields {
   // Strings
   static const String name = "name";
   static const String effect = "short_effect";
-  static const String statChanges = "stat_changes";
 
   // Integers
   static const String id = "id";
@@ -149,6 +189,7 @@ class MoveFields {
   static const String target = "target";
   static const String generation = "generation";
   static const String damageClass = "damage_class";
+  static const String statChanges = "stat_changes";
 
   static const List<String> fields = [
     name,
@@ -169,22 +210,18 @@ class MoveFields {
 }
 
 const String moveMaker = """
-  CREATE TABLE $moveModel(
+  CREATE TABLE IF NOT EXISTS $moveModel(
     ${MoveFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${MoveFields.name} TEXT NOT NULL,
     ${MoveFields.effect} TEXT NOT NULL,
-    ${MoveFields.statChanges} TEXT NOT NULL,
     ${MoveFields.pp} INTEGER NOT NULL,
-    ${MoveFields.power} INTEGER NOT NULL,
-    ${MoveFields.accuracy} INTEGER NOT NULL,
-    ${MoveFields.priority} INTEGER NOT NULL,
-    ${MoveFields.effectChance} INTEGER NOT NULL,
+    ${MoveFields.power} INTEGER,
+    ${MoveFields.accuracy} INTEGER,
+    ${MoveFields.priority} INTEGER,
+    ${MoveFields.effectChance} INTEGER,
     ${MoveFields.type} INTEGER NOT NULL,
     ${MoveFields.target} INTEGER NOT NULL,
     ${MoveFields.generation} INTEGER NOT NULL,
     ${MoveFields.damageClass} INTEGER NOT NULL,
-    FOREIGN KEY (${MoveFields.type}) REFERENCES $typingModel (id),
-    FOREIGN KEY (${MoveFields.target}) REFERENCES $targetModel (id),
-    FOREIGN KEY (${MoveFields.generation}) REFERENCES $generationModel (id),
-    FOREIGN KEY (${MoveFields.damageClass}) REFERENCES $damageClassModel (id)
+    ${MoveFields.statChanges} TEXT NOT NULL
   )""";

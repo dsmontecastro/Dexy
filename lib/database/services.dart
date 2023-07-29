@@ -1,130 +1,132 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 
 import 'db.dart';
 import 'api.dart';
 
-// Models
-import 'models/ability.dart';
-import 'models/damage_class.dart';
 import 'models/evolution.dart';
-import 'models/generation.dart';
-import 'models/move.dart';
-import 'models/typing.dart';
+import 'models/ability.dart';
 import 'models/pokemon.dart';
 import 'models/species.dart';
-import 'models/target.dart';
+import 'models/item.dart';
+import 'models/move.dart';
 
 class Dex with ChangeNotifier {
   //
 
-  static const int _items = 10;
-  final Pokemon fill = Pokemon.fill();
+  static const int _displays = 10;
+  int get displays => _displays;
 
-  // Modifiers
+  final Pokemon fill = Pokemon.filler();
+
+  // Pokedex Elements ----------------------------------------------------------
+
   int _listIndex = 0;
-  int _itemIndex = 0;
-  int get items => _items;
+  int _menuIndex = 0;
   int get listIndex => _listIndex;
-  int get itemIndex => _itemIndex;
-  Pokemon? _item;
-  Pokemon? get item => _item;
-  // List<Pokemon> _pokedex = [];
-  List<Pokemon> _pokedex = List.filled(15, Pokemon.fill());
+  int get menuIndex => _menuIndex;
+
+  Pokemon? _pokemon;
+  Pokemon get pokemon => _pokemon ?? fill;
+
+  List<Pokemon> _pokedex = [];
   List<Pokemon> get pokedex => _pokedex;
 
-  // Resources
-  List<Ability> _abilities = [];
-  List<DamageClass> _dmgClasses = [];
-  List<Evolution> _evolutions = [];
-  List<Generation> _generations = [];
-  List<Pokemon> _pokemon = [];
-  List<Species> _species = [];
+  // Resources -----------------------------------------------------------------
+  List<Item> _items = [];
   List<Move> _moves = [];
-  List<Target> _targets = [];
-  List<Typing> _typings = [];
+  List<Species> _species = [];
+  List<Pokemon> _pokemons = [];
+  List<Ability> _abilities = [];
+  List<Evolution> _evolutions = [];
 
-  List<Ability> get abilities => _abilities;
-  List<DamageClass> get dmgClasses => _dmgClasses;
-  List<Evolution> get evolutions => _evolutions;
-  List<Generation> get generations => _generations;
+  List<Item> get items => _items;
   List<Move> get moves => _moves;
-  List<Pokemon> get pokemon => _pokemon;
   List<Species> get species => _species;
-  List<Target> get targets => _targets;
-  List<Typing> get typings => _typings;
+  List<Pokemon> get pokemons => _pokemons;
+  List<Ability> get abilities => _abilities;
+  List<Evolution> get evolutions => _evolutions;
 
-  // API Status
-  bool _loaded = false;
-  bool get isLoaded => _loaded;
+  // Initializers --------------------------------------------------------------
 
-  Future<bool> callAPI({String table = ""}) async {
-    bool success = true;
+  Dex() {
+    _init();
+  }
 
-    if (!_loaded) {
-      bool flag = false;
+  Future<bool> _init() async {
+    DB.instance.makeTable();
+    bool success = false;
+    success = await _fillResources();
+    success = await _fillPokedex();
+    return success;
+  }
 
-      if (table == "") {
-        flag = await DB.instance.updateAll();
-      } else {
-        flag = await DB.instance.updateModel(table);
-      }
+  Future<bool> _fillPokedex() async {
+    bool result = true;
 
-      if (flag) {
-        _loaded = true;
-        success = await fillResources();
-        success = await fillPokedex();
-      }
+    try {
+      _listIndex = 0;
+      _menuIndex = 0;
+      _pokedex = _pokemons;
+      _pokemon = _pokedex[0];
+      notifyListeners();
+    } catch (err) {
+      result = false;
     }
+
+    return result;
+  }
+
+  Future<bool> _fillResources() async {
+    bool result = true;
+
+    try {
+      _evolutions = await DB.instance.getAll<Evolution>(evolutionModel);
+      _abilities = await DB.instance.getAll<Ability>(abilityModel);
+      _pokemons = await DB.instance.getAll<Pokemon>(pokemonModel);
+      _species = await DB.instance.getAll<Species>(speciesModel);
+      _items = await DB.instance.getAll<Item>(itemModel);
+      _moves = await DB.instance.getAll<Move>(moveModel);
+      notifyListeners();
+    } catch (err) {
+      log("! ERROR: $err");
+      result = false;
+    }
+
+    return result;
+  }
+
+  // API Status ----------------------------------------------------------------
+
+  Future<bool> callAPI({String table = "", int offset = 0}) async {
+    bool success = false;
+
+    if (table == "") {
+      success = await DB.instance.updateAll();
+    } else {
+      success = await DB.instance.updateModel(table, offset);
+    }
+
+    if (success) success = await _init();
 
     return success;
   }
 
-  // Initialize Fields
-  Future<bool> fillPokedex() async {
-    bool result = true;
+  // Alter Dex & Resources -----------------------------------------------------
 
-    try {
-      _itemIndex = 0;
-      _pokedex = _pokemon;
-      notifyListeners();
-    } catch (err) {
-      result = false;
-    }
-
-    return result;
-  }
-
-  Future<bool> fillResources() async {
-    bool result = true;
-
-    try {
-      _abilities = await DB.instance.getAll(abilityModel) as List<Ability>;
-      _dmgClasses =
-          await DB.instance.getAll(damageClassModel) as List<DamageClass>;
-      _evolutions = await DB.instance.getAll(evolutionModel) as List<Evolution>;
-      _generations =
-          await DB.instance.getAll(generationModel) as List<Generation>;
-      _moves = await DB.instance.getAll(moveModel) as List<Move>;
-      _pokemon = await DB.instance.getAll(pokemonModel) as List<Pokemon>;
-      _species = await DB.instance.getAll(speciesModel) as List<Species>;
-      _targets = await DB.instance.getAll(targetModel) as List<Target>;
-      _typings = await DB.instance.getAll(typingModel) as List<Typing>;
-      notifyListeners();
-    } catch (err) {
-      result = false;
-    }
-
-    return result;
-  }
-
-  // Change Current Items & Lists
   int count() => _pokedex.length;
-  Pokemon? get(int index) {
-    Pokemon? item;
+
+  Pokemon get(int index) {
+    Pokemon? pokemon;
     if (index >= 0 && index < _pokedex.length) {
-      item = _pokedex[index];
+      pokemon = _pokedex[index];
     }
-    return item;
+    return pokemon ?? fill;
+  }
+
+  void filter(String filter) {
+    _pokedex = _pokemons.where((p) => p.name.startsWith(filter)).toList();
+    cycleList(0);
   }
 
   void cycleList(int index) async {
@@ -137,42 +139,37 @@ class Dex with ChangeNotifier {
       _listIndex = max - 1;
     }
 
-    _item = _pokedex[_listIndex + itemIndex];
+    _pokemon = _pokedex[_listIndex + menuIndex];
     notifyListeners();
   }
 
-  void cycleIndex(int index) async {
-    _itemIndex = index;
+  void cycleMenu(int index) async {
+    _menuIndex = index;
 
-    if (itemIndex < 0) {
-      _itemIndex = 0;
-    } else if (itemIndex >= items) {
-      _itemIndex = items - 1;
+    if (menuIndex < 0) {
+      _menuIndex = 0;
+    } else if (menuIndex >= displays) {
+      _menuIndex = displays - 1;
     }
 
-    _item = _pokedex[_itemIndex];
+    _pokemon = _pokedex[_menuIndex];
     notifyListeners();
   }
 
-  List<Pokemon> filter(String filter) {
-    _pokedex = _pokemon.where((p) => p.name.startsWith(filter)).toList();
-    cycleList(0);
-    return _pokedex;
-  }
+  // Alter User-Toggled States -------------------------------------------------
 
-  // User-Toggled States
-  Future<bool> favorite(Pokemon pokemon) async {
+  Future<bool> favorite(Pokemon mon) async {
     try {
-      await DB.instance.toggleFavorite(pokemon);
+      await DB.instance.toggleFavorite(mon);
       return true;
     } catch (err) {
       return false;
     }
   }
 
-  Future<bool> caught(Pokemon pokemon) async {
+  Future<bool> caught(Pokemon mon) async {
     try {
-      await DB.instance.toggleCaught(pokemon);
+      await DB.instance.toggleCaught(mon);
       return true;
     } catch (err) {
       return false;
@@ -181,5 +178,19 @@ class Dex with ChangeNotifier {
 
   // [TEMP] Debugging ----------------------------------------------------------
 
-  Future<void> drop(String table) => DB.instance.dropTable(table);
+  Future<void> close() async => await DB.instance.close();
+
+  Future<void> make(String table) async {
+    await DB.instance.makeTable(table: table);
+  }
+
+  Future<void> drop(String table) async {
+    await DB.instance.dropTable(table);
+    log("! DROPPED $table");
+  }
+
+  Future<void> clear(String table) async {
+    await DB.instance.clearTable(table);
+    log("! CLEARED $table");
+  }
 }

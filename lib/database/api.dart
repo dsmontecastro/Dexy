@@ -1,18 +1,16 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart';
+import 'package:pokedex/extensions/string.dart';
 
 import 'db.dart';
 import 'models/_model.dart';
-import 'models/ability.dart';
-import 'models/damage_class.dart';
 import 'models/evolution.dart';
-import 'models/generation.dart';
-import 'models/typing.dart';
-import 'models/move.dart';
+import 'models/ability.dart';
 import 'models/pokemon.dart';
 import 'models/species.dart';
-import 'models/target.dart';
+import 'models/item.dart';
+import 'models/move.dart';
 
 typedef Result = Map<String, Map<String, String>>;
 
@@ -20,34 +18,42 @@ extension API on DB {
   // API Calls for Updating the DB
 
   // Constants
-  static const int tryLimit = 1;
-  static const String list = "limit=100000&offset=0";
+  static const int tryLimit = 10;
+  static const String list = "limit=100000&offset=";
   static const String head = "https://pokeapi.co/api/v2";
 
   // API Methods
 
   Future<bool> updateAll() async {
-    bool success = true;
     List<String> models = Models.models.keys.toList();
+    List<String> errors = [];
+    bool success = true;
 
     int i = 0;
     while (i < models.length && success == true) {
-      print("Model#$i");
-      success = success && await updateModel(models[i]);
-      if (success) i++;
+      int attempts = 0;
+      String model = models[i];
+
+      while (!success && attempts < tryLimit) {
+        success = await updateModel(model, 0);
+      }
+
+      if (!success) errors.add(model);
+      i++;
     }
 
+    log("ERRONEOUS TABLES: $errors");
     return success;
   }
 
-  Future<bool> updateModel(String tableName) async {
+  Future<bool> updateModel(String tableName, int offset) async {
+    DB.instance.makeTable(table: tableName);
+    List<int> errors = [];
     bool success = true;
-    DB.instance.createTable(tableName);
-    print("Name: $tableName");
 
     try {
       String type = tableName.replaceAll("_", "-");
-      Response resp = await get(Uri.parse("$head/$type?$list"));
+      Response resp = await get(Uri.parse("$head/$type?$list$offset"));
 
       // Validate GET
       if (resp.statusCode == 200) {
@@ -55,57 +61,64 @@ extension API on DB {
         results.cast<Result>();
 
         await Future.forEach(results, (item) async {
-          int i = 0;
+          int attempts = 0;
+          bool wasAdded = false;
           String url = item["url"];
-          bool added = await updateRow(tableName, url);
 
-          while (!added && i < 100) {
-            added = await updateRow(tableName, url);
+          while (!wasAdded && attempts < tryLimit) {
+            wasAdded = await updateRow(tableName, url);
           }
 
-          success = success && added;
+          if (!wasAdded) errors.add(url.getId());
+          success = wasAdded;
         });
       }
 
       // Catch Errors
     } catch (err) {
       log(err.toString());
+      log("ERRONEOUS ENTRIES: $errors");
       success = false;
     }
 
+    log("TABLE ($tableName): ${success ? "SUCCESS" : "FAILURE"}");
     return success;
   }
 
   Future<bool> updateRow(String tableName, String url) async {
     bool success = true;
-    print("> $url");
 
     try {
       Response resp = await get(Uri.parse(url));
+      log(url);
 
       // Validate GET
       if (resp.statusCode == 200) {
         Map<String, dynamic> map = jsonDecode(resp.body);
-        print("> ID: ${map["id"]}");
 
         if (tableName == abilityModel) {
           await upsert<Ability>(tableName, Ability.fromAPI(map));
-        } else if (tableName == damageClassModel) {
-          await upsert<DamageClass>(tableName, DamageClass.fromAPI(map));
         } else if (tableName == evolutionModel) {
           await upsert<Evolution>(tableName, Evolution.fromAPI(map));
-        } else if (tableName == generationModel) {
-          await upsert<Generation>(tableName, Generation.fromAPI(map));
         } else if (tableName == moveModel) {
           await upsert<Move>(tableName, Move.fromAPI(map));
         } else if (tableName == speciesModel) {
           await upsert<Species>(tableName, Species.fromAPI(map));
-        } else if (tableName == targetModel) {
-          await upsert<Target>(tableName, Target.fromAPI(map));
-        } else if (tableName == speciesModel) {
-          await upsert<Typing>(tableName, Typing.fromAPI(map));
-        } else if (tableName == pokemonModel) {
+
+          // Item Model has special columns
+        } else if (tableName == itemModel) {
+          //
+
+          // Get & Convert Sprites
+          String? spriteURL = map["sprites"]["default"];
+          String? sprite = await getSprite(spriteURL);
+          map[ItemFields.sprite] = sprite;
+
+          await upsert<Item>(tableName, Item.fromAPI(map));
+
           // Pokemon Model has special columns
+        } else if (tableName == pokemonModel) {
+          //
 
           // Save User-Toggled Fields
           Pokemon pokemon = await getById(tableName, map[PokemonFields.id]);
@@ -113,12 +126,12 @@ extension API on DB {
           map[PokemonFields.caught] = pokemon.caught;
 
           // Get & Convert Sprites
-          String iconURL =
-              map["sprites"]["versions"]["generation-viii"]["front_default"];
-          String imageURL =
-              map["sprites"]["other"]["official-artwork"]["front_default"];
-          map[PokemonFields.icon] = await updateSprite(iconURL);
-          map[PokemonFields.image] = await updateSprite(imageURL);
+          Map<String, dynamic> sprites = map["sprites"];
+          map[PokemonFields.icon] = sprites["front_default"];
+
+          Map<String, dynamic> official = sprites["other"]["official-artwork"];
+          map[PokemonFields.shiny] = official["front_shiny"];
+          map[PokemonFields.sprite] = official["front_default"];
 
           await upsert<Pokemon>(tableName, Pokemon.fromAPI(map));
         }
@@ -126,41 +139,28 @@ extension API on DB {
 
       // Catch Errors
     } catch (err) {
-      log(err.toString());
+      log("ID#${url.getId()}: ${err.toString()}");
       success = false;
     }
 
-    print("Done adding to $tableName!");
     return success;
   }
 
-  Future<String> updateSprite(String url) async {
-    String imageString = "";
+  // used in Item Sprites
+  Future<String?> getSprite(String? url) async {
+    String? imageString;
 
-    try {
-      Response resp = await get(Uri.parse(url));
-      if (resp.statusCode == 200) {
-        imageString = String.fromCharCodes(resp.bodyBytes);
+    if (url != null) {
+      try {
+        Response resp = await get(Uri.parse(url));
+        if (resp.statusCode == 200) {
+          imageString = String.fromCharCodes(resp.bodyBytes);
+        }
+      } catch (err) {
+        log("SPRITE#${url.getId()}: ${err.toString()}");
       }
-    } catch (err) {
-      log(err.toString());
     }
 
     return imageString;
-  }
-
-  // Helper Functions
-  List<Result> getResults(Response resp) {
-    List<dynamic> jsons = jsonDecode(resp.body);
-    List<Result> results = [];
-
-    for (int i = 0; i < jsons.length; i++) {
-      Map json = jsons[i];
-      json.map((key, value) =>
-          MapEntry(key as String, value as Map<String, String>));
-      results.add(json as Result);
-    }
-
-    return results;
   }
 }

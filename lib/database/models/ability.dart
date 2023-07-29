@@ -1,7 +1,7 @@
-import '_model.dart';
-import 'generation.dart';
-
+import 'package:pokedex/types/enums/generation.dart';
 import 'package:pokedex/extensions/string.dart';
+
+import '_model.dart';
 
 const String abilityModel = "ability";
 
@@ -19,7 +19,7 @@ class Ability implements Model {
 
   // Integers
   final int id;
-  final int generation; // Foreign Key
+  final Generation generation;
 
   //----------------------------------------------------------------------------
 
@@ -32,11 +32,17 @@ class Ability implements Model {
     required this.generation,
   });
 
+  Ability.filler()
+      : id = 0,
+        name = blank,
+        effect = blank,
+        generation = Generation.error;
+
   // JSON Parsing
   @override
   Ability.fromAPI(Map<String, dynamic> json)
-      : id = json[AbilityFields.id],
-        name = json[AbilityFields.name],
+      : id = json[AbilityFields.id] ?? 0,
+        name = json[AbilityFields.name] ?? blank,
         effect = _getEffect(json),
         generation = _getGeneration(json);
 
@@ -45,28 +51,38 @@ class Ability implements Model {
       : id = json[AbilityFields.id],
         name = json[AbilityFields.name],
         effect = json[AbilityFields.effect],
-        generation = json[AbilityFields.generation];
+        generation = Generation.values[json[AbilityFields.generation]];
 
   @override
   Map<String, dynamic> toDB() => {
         AbilityFields.id: id,
         AbilityFields.name: name,
         AbilityFields.effect: effect,
-        AbilityFields.generation: generation,
+        AbilityFields.generation: generation.index,
       };
 
   // Helper Functions
   static String _getEffect(Map<String, dynamic> json) {
-    List<dynamic> effects = json["effect_entries"];
-    Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
-    print(">> Effect: ${slot.first[AbilityFields.effect]}");
-    return slot.first[AbilityFields.effect];
+    List<dynamic> effects = json["effect_entries"] ?? [];
+    String field = AbilityFields.effect;
+
+    if (effects.isEmpty) {
+      effects = json["flavor_text_entries"];
+      field = "flavor_text";
+    }
+
+    String? effect;
+    if (effects.isNotEmpty) {
+      Iterable slot = effects.where((slot) => slot["language"]["name"] == "en");
+      effect = slot.first[field];
+    }
+
+    return effect ?? blank;
   }
 
-  static int _getGeneration(Map<String, dynamic> json) {
-    String url = json[AbilityFields.generation]["url"];
-    print(">> Generation: ${url.getId()}");
-    return url.getId();
+  static Generation _getGeneration(Map<String, dynamic> json) {
+    String url = json[AbilityFields.generation]["url"] ?? "000";
+    return Generation.values[url.getId()];
   }
 }
 
@@ -85,10 +101,9 @@ class AbilityFields {
 }
 
 const String abilityMaker = """
-  CREATE TABLE $abilityModel(
+  CREATE TABLE IF NOT EXISTS $abilityModel(
     ${AbilityFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${AbilityFields.name} TEXT NOT NULL,
     ${AbilityFields.effect} TEXT NOT NULL,
-    ${AbilityFields.generation} INTEGER NOT NULL,
-    FOREIGN KEY (${AbilityFields.generation}) REFERENCES $generationModel (id)
+    ${AbilityFields.generation} INTEGER NOT NULL
   )""";

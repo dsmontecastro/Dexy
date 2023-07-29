@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 
@@ -26,19 +25,62 @@ class DB {
     return _database;
   }
 
-  // Core Database Methods -----------------------------------------------------
+  // Table Handlers ------------------------------------------------------------
 
-  Future close() async {
+  Future<void> dropTable(String table) async {
     final Database? db = await instance.database;
-    db!.close();
+    await db!.execute("DROP TABLE IF EXISTS $table");
+  }
+
+  Future<void> clearTable(String table) async {
+    final Database? db = await instance.database;
+    await db!.execute("DELETE FROM $table");
+  }
+
+  Future<void> makeTable({String table = ""}) async {
+    final Database? db = await instance.database;
+
+    if (table == "") {
+      _onCreate(db!, await db.getVersion());
+    } else {
+      db!.execute(Models.makers[table]!);
+      addFiller(db, table);
+    }
   }
 
   Future<bool> tableExists(String table) async {
     final Database? db = await instance.database;
-    List<dynamic> tables =
-        await db!.query('sqlite_master', where: 'name = ?', whereArgs: [table]);
+    List<dynamic> tables = await db!.query(
+      'sqlite_master',
+      where: 'name = ?',
+      whereArgs: [table],
+    );
 
     return tables.isNotEmpty;
+  }
+
+  Future<void> addFiller(Database db, String table) async {
+    int id = await db.update(
+      table,
+      Models.fillers[table]!,
+      where: "id = ?",
+      whereArgs: [0],
+    );
+
+    if (id == 0) {
+      await db.insert(
+        table,
+        Models.fillers[table]!,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+  }
+
+  // Core Database Methods -----------------------------------------------------
+
+  Future<void> close() async {
+    final Database? db = await instance.database;
+    db!.close();
   }
 
   Future<int> insert<M extends Model>(String table, M item) async {
@@ -60,13 +102,10 @@ class DB {
     );
   }
 
-  // Future<int> upsert(String table, Map<String, dynamic> json) async {
-  // final int id = await getById(table, json["id"] as int);
   Future<int> upsert<M extends Model>(String table, M item) async {
-    final int id = await getById<M>(table, item.getId());
-    print(">>> UPSERT@$table: $id");
+    final M row = await getById<M>(table, item.getId());
 
-    if (id > 0) {
+    if (row.getId() > 0) {
       return await update(table, item);
     } else {
       return await insert(table, item);
@@ -82,7 +121,7 @@ class DB {
     );
   }
 
-  Future getById<M extends Model>(String table, int id) async {
+  Future<M> getById<M extends Model>(String table, int id) async {
     final Database? db = await instance.database;
 
     final query = await db!.query(
@@ -91,25 +130,30 @@ class DB {
       whereArgs: [id],
       columns: Models.fields[M],
     );
-
-    try {
-      return Models.fromDB(query.first);
-    } catch (err) {
-      // throw Exception(err);
-      return 0;
+    if (query.isNotEmpty) {
+      return Models.fromDB<M>(query.first);
+    } else {
+      return Models.filler<M>();
     }
   }
 
-  Future<List> getAll<M extends Model>(String table) async {
+  Future<List<M>> getAll<M extends Model>(String table) async {
     final Database? db = await instance.database;
 
     final query = await db!.query(
       table,
+      where: "id != 0",
       orderBy: "ID ASC",
       columns: Models.fields[M],
     );
 
-    return query.map((item) => Models.fromDB(query.first)).toList();
+    List<M> results = [];
+
+    if (query.isNotEmpty) {
+      results = query.map((row) => Models.fromDB<M>(row)).toList();
+    }
+
+    return results;
   }
 
   // Favorite/Caught Toggles ---------------------------------------------------
@@ -142,35 +186,24 @@ class DB {
   Future<Database> _init(String fileName) async {
     final String dbPath = await getDatabasesPath();
     final String filePath = path.join(dbPath + fileName);
-    debugPrint("DB@: $filePath");
 
-    return openDatabase(filePath,
-        version: 1, onCreate: _onCreate, onConfigure: _onConfigure);
+    return openDatabase(
+      filePath,
+      version: 1,
+      onCreate: _onCreate,
+      onConfigure: _onConfigure,
+    );
   }
 
-  Future _onConfigure(Database db) async =>
-      await db.execute("PRAGMA foreign_keys = ON");
+  Future<void> _onConfigure(Database db) async => await db.execute("PRAGMA foreign_keys = ON");
 
-  Future _onCreate(Database db, int version) async {
-    // Create TABLEs from Models
+  Future<void> _onCreate(Database db, int version) async {
+    Map<String, String> makers = Models.makers;
+    List<String> models = makers.keys.toList();
 
-    List<String> models = Models.models.keys.toList();
-
-    for (String table in models) {
-      await db.execute(table);
+    for (String model in models) {
+      db.execute(makers[model]!);
+      addFiller(db, model);
     }
-  }
-
-  // Debugging -----------------------------------------------------------------
-
-  Future<void> createTable(String table) async {
-    final Database? db = await instance.database;
-    bool exists = await tableExists(table);
-    if (!exists) db!.execute(Models.makers[table]!);
-  }
-
-  Future<void> dropTable(String table) async {
-    final Database? db = await instance.database;
-    await db!.execute("DROP TABLE IF EXISTS $table");
   }
 }

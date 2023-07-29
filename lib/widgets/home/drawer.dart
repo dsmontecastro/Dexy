@@ -28,9 +28,7 @@ class CustomDrawer extends StatelessWidget {
           IconButton(
             icon: load,
             alignment: Alignment.bottomLeft,
-            // onPressed: () => context.dex.callAPI(),
-            onPressed: () => context.dex.callAPI(table: Models.target),
-            // onPressed: () => context.dex.drop(Models.typing),
+            onPressed: () async => await context.db.callAPI(table: Models.ability),
           ),
         ],
       ),

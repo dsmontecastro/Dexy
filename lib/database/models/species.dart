@@ -1,8 +1,8 @@
 import '_model.dart';
 import 'evolution.dart';
-import 'generation.dart';
 
 import 'package:pokedex/extensions/string.dart';
+import 'package:pokedex/types/enums/generation.dart';
 
 const String speciesModel = "pokemon_species";
 
@@ -31,10 +31,10 @@ class Species implements Model {
   final int happiness;
   final int catchRate;
   final int genderRate;
+  final Generation generation;
 
   // Foreign Keys
   final int evolutions;
-  final int generation;
   final List<int> varieties;
 
   //----------------------------------------------------------------------------
@@ -55,9 +55,28 @@ class Species implements Model {
       required this.happiness,
       required this.catchRate,
       required this.genderRate,
-      required this.evolutions,
       required this.generation,
+      required this.evolutions,
       required this.varieties});
+
+  Species.filler()
+      : name = "_",
+        text = "_",
+        genus = "_",
+        growthRate = "_",
+        hasAlter = false,
+        hasForms = false,
+        isLegendary = false,
+        isMythical = false,
+        isBaby = false,
+        id = 0,
+        order = 0,
+        happiness = 0,
+        catchRate = 0,
+        genderRate = 0,
+        generation = Generation.error,
+        evolutions = 0,
+        varieties = [];
 
   // JSON Parsing
 
@@ -73,15 +92,14 @@ class Species implements Model {
         isMythical = json[SpeciesFields.isMythical],
         isBaby = json[SpeciesFields.isBaby],
         id = json[SpeciesFields.id],
-        order = json["order"], // problematic string in DB
-        happiness = json[SpeciesFields.happiness],
+        order = json["order"] ?? 0, // problematic string in DB
+        happiness = json[SpeciesFields.happiness] ?? 0, // Nullable in later Gens
         catchRate = json[SpeciesFields.catchRate],
         genderRate = json[SpeciesFields.genderRate],
+        generation = _getGeneration(json),
         evolutions = _getURLid(json, SpeciesFields.evolutions),
-        generation = _getURLid(json, SpeciesFields.generation),
         varieties = _getVarieties(json);
 
-  @override
   Species.fromDB(Map<String, dynamic> json)
       : name = json[SpeciesFields.name],
         text = json[SpeciesFields.text],
@@ -97,8 +115,8 @@ class Species implements Model {
         happiness = json[SpeciesFields.happiness],
         catchRate = json[SpeciesFields.catchRate],
         genderRate = json[SpeciesFields.genderRate],
+        generation = Generation.values[json[SpeciesFields.generation]],
         evolutions = json[SpeciesFields.evolutions],
-        generation = json[SpeciesFields.generation],
         varieties = (json[SpeciesFields.varieties] as String).toListInt();
 
   @override
@@ -117,17 +135,28 @@ class Species implements Model {
         SpeciesFields.happiness: happiness,
         SpeciesFields.catchRate: catchRate,
         SpeciesFields.genderRate: genderRate,
+        SpeciesFields.generation: generation.index,
         SpeciesFields.evolutions: evolutions,
-        SpeciesFields.generation: generation,
-        SpeciesFields.varieties: varieties.join(separator)
+        SpeciesFields.varieties: varieties.join(",")
       };
 
   // Helper Functions
-  static String _getLang(
-      Map<String, dynamic> json, String field, String subfield) {
-    List<dynamic> types = json["types"];
-    Iterable slot = types.where((slot) => slot["language"]["name"] == "en");
-    return slot.first[field];
+
+  static Generation _getGeneration(Map<String, dynamic> json) {
+    String url = json[SpeciesFields.generation]["url"] ?? "000";
+    return Generation.values[url.getId()];
+  }
+
+  static String _getLang(Map<String, dynamic> json, String field, String subfield) {
+    List<dynamic> list = json[field];
+
+    String? text;
+    if (list.isNotEmpty) {
+      Iterable slot = list.where((slot) => slot["language"]["name"] == "en");
+      text = slot.last[subfield];
+    }
+
+    return text ?? "_";
   }
 
   static int _getURLid(Map<String, dynamic> json, String field) {
@@ -161,7 +190,7 @@ class SpeciesFields {
 
   // Booleans
   static const hasAlter = "has_gender_differences";
-  static const hasForms = "form_switchable";
+  static const hasForms = "forms_switchable";
   static const isLegendary = "is_legendary";
   static const isMythical = "is_mythical";
   static const isBaby = "is_baby";
@@ -172,10 +201,10 @@ class SpeciesFields {
   static const happiness = "base_happiness";
   static const catchRate = "capture_rate";
   static const genderRate = "gender_rate";
+  static const generation = "generation";
 
   // Foreign Keys
-  static const evolutions = "evolutions";
-  static const generation = "generation";
+  static const evolutions = "evolution_chain";
   static const varieties = "varieties";
 
   // List of All Fields
@@ -201,7 +230,7 @@ class SpeciesFields {
 }
 
 const String speciesMaker = """
-  CREATE TABLE $speciesModel(
+  CREATE TABLE IF NOT EXISTS $speciesModel(
     ${SpeciesFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${SpeciesFields.name} TEXT NOT NULL,
     ${SpeciesFields.text} TEXT NOT NULL,
@@ -216,9 +245,8 @@ const String speciesMaker = """
     ${SpeciesFields.happiness} INTEGER NOT NULL,
     ${SpeciesFields.catchRate} INTEGER NOT NULL,
     ${SpeciesFields.genderRate} INTEGER NOT NULL,
-    ${SpeciesFields.evolutions} INTEGER NOT NULL,
     ${SpeciesFields.generation} INTEGER NOT NULL,
-    ${SpeciesFields.varieties} INTEGER NOT NULL,
-    FOREIGN KEY (${SpeciesFields.evolutions}) REFERENCES $evolutionModel (id),
-    FOREIGN KEY (${SpeciesFields.generation}) REFERENCES $generationModel (id)
+    ${SpeciesFields.evolutions} INTEGER NOT NULL,
+    ${SpeciesFields.varieties} TEXT NOT NULL,
+    FOREIGN KEY (${SpeciesFields.evolutions}) REFERENCES $evolutionModel (id)
   )""";

@@ -1,13 +1,12 @@
 import 'dart:convert';
 
 import '_model.dart';
-import '_classes.dart';
-
 import 'ability.dart';
-import 'typing.dart';
 import 'species.dart';
 
 import 'package:pokedex/extensions/string.dart';
+import 'package:pokedex/types/enums/typing.dart';
+import 'package:pokedex/types/classes/stats.dart';
 
 const String pokemonModel = "pokemon";
 
@@ -19,8 +18,9 @@ class Pokemon implements Model {
 
   // Strings
   final String name;
-  final String icon;
-  final String image;
+  final String? icon;
+  final String? shiny;
+  final String? sprite;
 
   // Booleans
   bool caught;
@@ -33,18 +33,18 @@ class Pokemon implements Model {
   final int height;
   final int weight;
   final int baseXP;
+  final Typing type1;
+  final Typing type2;
 
   // Foreign Keys
-  final int type1;
-  final int type2;
   final int ability1;
   final int ability2;
   final int abilityH;
   final int species;
 
-  // List of Foreign Keys
-  final List<int> heldItems;
-  final List<Map<String, dynamic>> moves;
+  // Lists of Foreign Keys
+  final List<int> heldItems; // Item Table
+  final List<Map<String, dynamic>> moves; // Move Table
 
   // Stat Modifiers
   final Stats evs;
@@ -56,7 +56,8 @@ class Pokemon implements Model {
   Pokemon(
       {required this.name,
       required this.icon,
-      required this.image,
+      required this.shiny,
+      required this.sprite,
       this.caught = false,
       this.favorite = false,
       required this.isDefault,
@@ -77,10 +78,11 @@ class Pokemon implements Model {
       required this.baseStats});
 
   // Filler Constructor
-  Pokemon.fill()
-      : name = "---",
-        icon = "-",
-        image = "-",
+  Pokemon.filler()
+      : name = blank,
+        icon = null,
+        shiny = null,
+        sprite = null,
         isDefault = false,
         favorite = false,
         caught = false,
@@ -89,8 +91,8 @@ class Pokemon implements Model {
         height = 0,
         weight = 0,
         baseXP = 0,
-        type1 = 0,
-        type2 = 0,
+        type1 = Typing.error,
+        type2 = Typing.error,
         ability1 = 0,
         ability2 = 0,
         abilityH = 0,
@@ -103,23 +105,24 @@ class Pokemon implements Model {
   // JSON Parsing
   @override
   Pokemon.fromAPI(Map<String, dynamic> json)
-      : caught = json[PokemonFields.caught] ?? false,
-        favorite = json[PokemonFields.favorite] ?? false,
-        name = json[PokemonFields.name],
+      : name = json[PokemonFields.name],
         icon = json[PokemonFields.icon],
-        image = json[PokemonFields.image],
+        shiny = json[PokemonFields.shiny],
+        sprite = json[PokemonFields.sprite],
         isDefault = json[PokemonFields.isDefault],
+        favorite = json[PokemonFields.favorite],
+        caught = json[PokemonFields.caught],
         id = json[PokemonFields.id],
         order = json["order"], // problematic string in DB
         height = json[PokemonFields.height],
         weight = json[PokemonFields.weight],
-        baseXP = json[PokemonFields.baseXP],
+        baseXP = json[PokemonFields.baseXP] ?? 0, // Nullable in later Gens
         type1 = _getType(json, 1),
         type2 = _getType(json, 2),
-        ability1 = _getPokemon(json, 1),
-        ability2 = _getPokemon(json, 2),
-        abilityH = _getPokemon(json, 3),
-        species = json[PokemonFields.species],
+        ability1 = _getAbility(json, 1),
+        ability2 = _getAbility(json, 2),
+        abilityH = _getAbility(json, 3),
+        species = _getSpecies(json),
         heldItems = _getHeldItems(json),
         moves = _getMoves(json),
         evs = _getStats(json, PokemonFields.evs),
@@ -129,7 +132,8 @@ class Pokemon implements Model {
   Pokemon.fromDB(Map<String, dynamic> json)
       : name = json[PokemonFields.name],
         icon = json[PokemonFields.icon],
-        image = json[PokemonFields.image],
+        shiny = json[PokemonFields.shiny],
+        sprite = json[PokemonFields.sprite],
         isDefault = json[PokemonFields.isDefault] == 1,
         favorite = json[PokemonFields.favorite] == 1,
         caught = json[PokemonFields.caught] == 1,
@@ -138,22 +142,23 @@ class Pokemon implements Model {
         height = json[PokemonFields.height],
         weight = json[PokemonFields.weight],
         baseXP = json[PokemonFields.baseXP],
-        type1 = json[PokemonFields.type1],
-        type2 = json[PokemonFields.type2],
+        type1 = Typing.values[json[PokemonFields.type1]],
+        type2 = Typing.values[json[PokemonFields.type2]],
         ability1 = json[PokemonFields.ability1],
         ability2 = json[PokemonFields.abilityH],
         abilityH = json[PokemonFields.abilityH],
         species = json[PokemonFields.species],
         heldItems = (json[PokemonFields.heldItems] as String).toListInt(),
         moves = _getMovesFromDB(json[PokemonFields.moves]),
-        evs = Stats.fromList(json[PokemonFields.evs]),
-        baseStats = Stats.fromList(json[PokemonFields.baseStats]);
+        evs = Stats.fromString(json[PokemonFields.evs]),
+        baseStats = Stats.fromString(json[PokemonFields.baseStats]);
 
   @override
   Map<String, dynamic> toDB() => {
         PokemonFields.name: name,
         PokemonFields.icon: icon,
-        PokemonFields.image: image,
+        PokemonFields.shiny: shiny,
+        PokemonFields.sprite: sprite,
         PokemonFields.isDefault: isDefault ? 1 : 0,
         PokemonFields.favorite: favorite ? 1 : 0,
         PokemonFields.caught: caught ? 1 : 0,
@@ -162,34 +167,65 @@ class Pokemon implements Model {
         PokemonFields.height: height,
         PokemonFields.weight: weight,
         PokemonFields.baseXP: baseXP,
-        PokemonFields.type1: type1,
-        PokemonFields.type2: type2,
+        PokemonFields.type1: type1.index,
+        PokemonFields.type2: type2.index,
         PokemonFields.ability1: ability1,
         PokemonFields.ability2: ability2,
         PokemonFields.abilityH: abilityH,
         PokemonFields.species: species,
-        PokemonFields.moves: moves.join(separator),
         PokemonFields.heldItems: heldItems.join(separator),
+        PokemonFields.moves: moves.join(separator),
         PokemonFields.evs: evs.toString(),
         PokemonFields.baseStats: baseStats.toString(),
       };
 
   // Helper Functions
-  static Stats _getStats(Map<String, dynamic> json, String type) {
-    List<int> stats = [for (final stat in json["stats"]) stat[type] as int];
-    return Stats.fromList(stats);
+  static int _getSpecies(Map<String, dynamic> json) {
+    String url = json[PokemonFields.species]["url"];
+    return url.getId();
   }
 
-  static int _getType(Map<String, dynamic> json, int index) {
-    List<Map> types = json["types"];
-    Iterable slot = types.where((slot) => slot["slot"] == index);
-    return slot.isEmpty ? 0 : int.parse(slot.first["type"]["url"][-2]);
+  static Stats _getStats(Map<String, dynamic> json, String field) {
+    List<dynamic> maps = json["stats"];
+    List<int> list = [];
+
+    for (final map in maps) {
+      list.add(map[field]);
+    }
+
+    return Stats.fromList(list);
   }
 
-  static int _getPokemon(Map json, int index) {
-    List<Map> abilities = json["abilities"];
-    Iterable slot = abilities.where((slot) => slot["slot"] == index);
-    return slot.isEmpty ? 0 : int.parse(slot.first["ability"]["url"][-2]);
+  static Typing _getType(Map<String, dynamic> json, int index) {
+    List<dynamic> types = json["types"];
+    Iterable slot = types.where((type) => type["slot"] == index);
+
+    if (slot.isEmpty) return Typing.error;
+
+    String url = slot.first["type"]["url"];
+
+    // Special Conversion for Irregular Types
+    int id = url.getId();
+    if (id == 10001) {
+      id = 0;
+    } else if (id == 10002) {
+      id = 20;
+    }
+
+    return Typing.values[id];
+  }
+
+  static int _getAbility(Map<String, dynamic> json, int index) {
+    List<dynamic> abilities = json["abilities"];
+    Iterable slot = abilities.where((ability) => ability["slot"] == index);
+
+    int abilityId = 0;
+    if (slot.isNotEmpty) {
+      String url = slot.first["ability"]["url"];
+      abilityId = url.getId();
+    }
+
+    return abilityId;
   }
 
   static List<int> _getHeldItems(Map<String, dynamic> json) {
@@ -204,25 +240,29 @@ class Pokemon implements Model {
   }
 
   static List<Map<String, dynamic>> _getMoves(Map<String, dynamic> json) {
-    List<Map<String, dynamic>> moves = [];
+    List<Map<String, dynamic>> results = [];
 
     for (final move in json[PokemonFields.moves]) {
       String url = move["move"]["url"];
-      Map details = move["version_group_details"][-1];
+      Map<String, dynamic> details = (move["version_group_details"] as List).last;
 
-      moves.add({
+      results.add({
         "id": url.getId(),
-        "level": int.parse(details["level_learned_at"]),
+        "level": details["level_learned_at"],
         "method": details["move_learn_method"]["name"],
       });
     }
 
-    return moves;
+    return results;
   }
 
   static List<Map<String, dynamic>> _getMovesFromDB(String encoded) {
     List<String> jsons = encoded.split(separator);
-    return jsons.map((j) => jsonDecode(j) as Map<String, dynamic>).toList();
+    if (jsons.isEmpty) return [];
+
+    List<Map<String, dynamic>> results = [];
+    jsons.map((j) => results.add(jsonDecode(j)));
+    return results.toList();
   }
 }
 
@@ -232,7 +272,8 @@ class PokemonFields {
   // Strings
   static const String name = "name";
   static const String icon = "icon";
-  static const String image = "image";
+  static const String shiny = "shiny";
+  static const String sprite = "sprite";
 
   // Booleans
   static const String caught = "caught";
@@ -266,7 +307,8 @@ class PokemonFields {
   static const List<String> fields = [
     name,
     icon,
-    image,
+    shiny,
+    sprite,
     caught,
     favorite,
     isDefault,
@@ -281,19 +323,20 @@ class PokemonFields {
     ability2,
     abilityH,
     species,
-    moves,
     heldItems,
+    moves,
     evs,
     baseStats,
   ];
 }
 
 const String pokemonMaker = """
-  CREATE TABLE $pokemonModel(
+  CREATE TABLE IF NOT EXISTS $pokemonModel(
     ${PokemonFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${PokemonFields.name} TEXT NOT NULL,
-    ${PokemonFields.icon} TEXT NOT NULL,
-    ${PokemonFields.image} TEXT NOT NULL,
+    ${PokemonFields.icon} TEXT,
+    ${PokemonFields.shiny} TEXT,
+    ${PokemonFields.sprite} TEXT,
     ${PokemonFields.caught} INTEGER NOT NULL,
     ${PokemonFields.favorite} INTEGER NOT NULL,
     ${PokemonFields.isDefault} INTEGER NOT NULL,
@@ -307,12 +350,10 @@ const String pokemonMaker = """
     ${PokemonFields.ability2} INTEGER NOT NULL,
     ${PokemonFields.abilityH} INTEGER NOT NULL,
     ${PokemonFields.species} INTEGER NOT NULL,
-    ${PokemonFields.moves} TEXT NOT NULL,
     ${PokemonFields.heldItems} TEXT NOT NULL,
+    ${PokemonFields.moves} TEXT NOT NULL,
     ${PokemonFields.evs} TEXT NOT NULL,
     ${PokemonFields.baseStats} TEXT NOT NULL,
-    FOREIGN KEY (${PokemonFields.type1}) REFERENCES $typingModel (id),
-    FOREIGN KEY (${PokemonFields.type2}) REFERENCES $typingModel (id),
     FOREIGN KEY (${PokemonFields.ability1}) REFERENCES $abilityModel (id),
     FOREIGN KEY (${PokemonFields.ability2}) REFERENCES $abilityModel (id),
     FOREIGN KEY (${PokemonFields.abilityH}) REFERENCES $abilityModel (id),

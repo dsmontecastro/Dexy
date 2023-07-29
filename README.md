@@ -17,4 +17,6 @@ samples, guidance on mobile development, and a full API reference.
 
 ## TO-DO:
 ### Tables/Models:
-- HeldItems Model
+- Add Loading Screen(s)
+- Add Num Extension "Clamp"
+- Work on UI (Menu > Main)

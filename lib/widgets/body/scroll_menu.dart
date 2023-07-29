@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pokedex/extensions/provider.dart';
 
-import '../../database/models/pokemon.dart';
+import 'package:pokedex/extensions/provider.dart';
+import 'package:pokedex/database/models/pokemon.dart';
 
 class ScrollMenu extends StatelessWidget {
   const ScrollMenu({super.key});
@@ -10,14 +10,14 @@ class ScrollMenu extends StatelessWidget {
   Widget build(context) {
     // Build Proper
 
-    final int count = context.dex.items;
+    final int count = context.dex.displays;
     final controller = PageController(viewportFraction: 1 / count);
 
     void cycle(int index) {
       if (index < 0 || index >= count) {
         context.dex.cycleList(index);
       } else {
-        context.dex.cycleIndex(index);
+        context.dex.cycleMenu(index);
       }
     }
 
@@ -42,22 +42,22 @@ class ScrollMenu extends StatelessWidget {
         // Item Properties
         itemCount: count,
         itemBuilder: (context, index) {
-          return PokemonItem(index);
+          return ScrollItem(index);
         },
       ),
     );
   }
 }
 
-class PokemonItem extends StatelessWidget {
-  const PokemonItem(this.id, {super.key});
+class ScrollItem extends StatelessWidget {
+  const ScrollItem(this.id, {super.key});
   final int id;
 
   @override
   Widget build(context) {
     int index = context.dex.listIndex + id;
-    bool isPicked = context.dex.itemIndex == id;
-    Pokemon pokemon = context.dex.get(index) ?? context.dex.fill;
+    bool isPicked = context.dex.menuIndex == id;
+    Pokemon pokemon = context.dex.get(index);
 
     return Transform.scale(
       scale: isPicked ? 1 : 0.8,

@@ -1,110 +1,109 @@
-import 'ability.dart';
-import 'damage_class.dart';
 import 'evolution.dart';
-import 'generation.dart';
-import 'typing.dart';
-import 'move.dart';
+import 'ability.dart';
 import 'pokemon.dart';
 import 'species.dart';
-import 'target.dart';
+import 'item.dart';
+import 'move.dart';
 
 class Models {
-  const Models();
-
   // // Get Model Names
   static const String ability = abilityModel;
-  static const String dmgClass = damageClassModel;
   static const String evolution = evolutionModel;
-  static const String generation = generationModel;
+  static const String item = itemModel;
   static const String move = moveModel;
-  static const String typing = typingModel;
   static const String pokemon = pokemonModel;
   static const String species = speciesModel;
-  static const String target = targetModel;
 
   // Create Model Variant from API
-  static T? fromAPI<T>(Map<String, dynamic> json) {
+  static T fromAPI<T>(Map<String, dynamic> json) {
     if (T == Ability) {
       return Ability.fromAPI(json) as T;
-    } else if (T == DamageClass) {
-      return DamageClass.fromAPI(json) as T;
     } else if (T == Evolution) {
       return Evolution.fromAPI(json) as T;
-    } else if (T == Generation) {
-      return Generation.fromAPI(json) as T;
+    } else if (T == Item) {
+      return Item.fromAPI(json) as T;
     } else if (T == Move) {
       return Move.fromAPI(json) as T;
-    } else if (T == Typing) {
-      return Typing.fromAPI(json) as T;
     } else if (T == Pokemon) {
       return Pokemon.fromAPI(json) as T;
     } else if (T == Species) {
       return Species.fromAPI(json) as T;
-    } else if (T == Target) {
-      return Target.fromAPI(json) as T;
     } else {
-      return null;
+      return Pokemon.fromAPI(json) as T;
     }
   }
 
   // Create Model Variant from DB
-  static T? fromDB<T>(Map<String, dynamic> json) {
+  static T fromDB<T>(Map<String, dynamic> json) {
     if (T == Ability) {
       return Ability.fromDB(json) as T;
-    } else if (T == DamageClass) {
-      return DamageClass.fromDB(json) as T;
     } else if (T == Evolution) {
       return Evolution.fromDB(json) as T;
-    } else if (T == Generation) {
-      return Generation.fromDB(json) as T;
+    } else if (T == Item) {
+      return Item.fromDB(json) as T;
     } else if (T == Move) {
       return Move.fromDB(json) as T;
-    } else if (T == Typing) {
-      return Typing.fromDB(json) as T;
     } else if (T == Pokemon) {
       return Pokemon.fromDB(json) as T;
     } else if (T == Species) {
       return Species.fromDB(json) as T;
-    } else if (T == Target) {
-      return Target.fromDB(json) as T;
     } else {
-      return null;
+      return Models.fromDB(json) as T;
+    }
+  }
+
+  // Create Filler for Model
+  static T filler<T>() {
+    if (T == Ability) {
+      return Ability.filler() as T;
+    } else if (T == Evolution) {
+      return Evolution.filler() as T;
+    } else if (T == Item) {
+      return Item.filler() as T;
+    } else if (T == Move) {
+      return Move.filler() as T;
+    } else if (T == Pokemon) {
+      return Pokemon.filler() as T;
+    } else if (T == Species) {
+      return Species.filler() as T;
+    } else {
+      return Pokemon.filler() as T;
     }
   }
 
   // Get Table-creation Commands
   static const Map<String, String> makers = {
     evolutionModel: evolutionMaker,
-    generationModel: generationMaker,
-    damageClassModel: damageClassMaker,
-    targetModel: targetMaker,
-    typingModel: targetMaker,
     abilityModel: abilityMaker,
+    itemModel: itemMaker,
     moveModel: moveMaker,
     pokemonModel: pokemonMaker,
     speciesModel: speciesMaker,
   };
 
+  static Map<String, Map<String, dynamic>> fillers = {
+    evolutionModel: Evolution.filler().toDB(),
+    abilityModel: Ability.filler().toDB(),
+    itemModel: Item.filler().toDB(),
+    moveModel: Move.filler().toDB(),
+    pokemonModel: Pokemon.filler().toDB(),
+    speciesModel: Species.filler().toDB(),
+  };
+
   static const Map<Type, List<String>> fields = {
     Ability: AbilityFields.fields,
-    DamageClass: DamageClassFields.fields,
     Evolution: EvolutionFields.fields,
-    Generation: GenerationFields.fields,
+    Item: ItemFields.fields,
     Move: MoveFields.fields,
-    Typing: TypingFields.fields,
     Pokemon: PokemonFields.fields,
     Species: SpeciesFields.fields,
-    Target: TargetFields.fields,
   };
 
   // Reordered for Foreign Keys
   static const Map<String, Type> models = {
     evolutionModel: Evolution,
-    generationModel: Generation,
-    damageClassModel: DamageClass,
-    targetModel: Target,
-    typingModel: Typing,
     abilityModel: Ability,
+    itemModel: Item,
     moveModel: Move,
     pokemonModel: Pokemon,
     speciesModel: Species,
