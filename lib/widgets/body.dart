@@ -12,14 +12,19 @@ class Body extends StatelessWidget {
   Widget build(context) {
     return OrientationBuilder(
       builder: (context, orientation) {
-        final isVertical = orientation == Orientation.portrait;
+        final Size size = MediaQuery.of(context).size;
+        final bool isVertical = orientation == Orientation.portrait;
         final Axis direction = isVertical ? Axis.vertical : Axis.horizontal;
 
-        return Flex(
-          direction: direction,
-          children: List.generate(
-            children.length,
-            (int i) => Expanded(child: Center(child: children[i])),
+        return SizedBox(
+          width: size.width,
+          height: size.height,
+          child: Flex(
+            direction: direction,
+            mainAxisSize: MainAxisSize.max,
+            children: List.generate(children.length, (int i) {
+              return Expanded(child: Center(child: children[i]));
+            }),
           ),
         );
       },

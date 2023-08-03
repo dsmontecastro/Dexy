@@ -1,78 +1,111 @@
 import 'package:flutter/material.dart';
-
 import 'package:pokedex/extensions/provider.dart';
-import 'package:pokedex/database/models/pokemon.dart';
 
-class ScrollMenu extends StatelessWidget {
+import 'package:pokedex/database/services.dart';
+import 'package:pokedex/database/models/species.dart';
+
+const int menuCount = Dex.menuCount;
+const int rad = menuCount ~/ 2;
+
+class ScrollMenu extends StatefulWidget {
   const ScrollMenu({super.key});
+
+  @override
+  ScrollState createState() => ScrollState();
+}
+
+class ScrollState extends State<ScrollMenu> {
+  final PageController controller = PageController(
+    initialPage: 0,
+    viewportFraction: 0.1,
+  );
+
+  int index = 0;
+  void scroll(int i) {
+    setState(() {
+      index = i;
+      context.db.scroll(index);
+    });
+  }
 
   @override
   Widget build(context) {
     // Build Proper
 
-    final int count = context.dex.displays;
-    final controller = PageController(viewportFraction: 1 / count);
+    final Size size = MediaQuery.of(context).size;
+    final Widget divider = SizedBox(
+      width: size.width / 15,
+      height: size.height / menuCount / 5,
+    );
 
-    void cycle(int index) {
-      if (index < 0 || index >= count) {
-        context.dex.cycleList(index);
-      } else {
-        context.dex.cycleMenu(index);
-      }
-    }
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.symmetric(vertical: size.height / 15),
+      decoration: const BoxDecoration(
+        color: Colors.green,
+      ),
 
-    return Scrollbar(
       // Scrollbar Container
-
-      // Scrollbar Settings
-      thumbVisibility: true,
-      controller: controller,
-
-      // Core PageView Widget
-      child: ListView.builder(
-        // Page Builder
-
-        // Scroller Properties
-        // padEnds: false,
+      child: Scrollbar(
+        // Scrollbar Settings
+        thumbVisibility: true,
+        trackVisibility: true,
         controller: controller,
-        // onPageChanged: cycle,
-        scrollDirection: Axis.vertical,
-        physics: const PageScrollPhysics(),
 
-        // Item Properties
-        itemCount: count,
-        itemBuilder: (context, index) {
-          return ScrollItem(index);
-        },
+        // Core List
+        child: PageView.builder(
+          // Scroller Properties
+          padEnds: true,
+          pageSnapping: true,
+          onPageChanged: scroll,
+          controller: controller,
+          physics: const ScrollPhysics(),
+          scrollDirection: Axis.vertical,
+
+          // Item Properties
+          itemCount: context.dex.count,
+          itemBuilder: (_, id) {
+            return Padding(
+              padding: EdgeInsets.only(left: size.width / 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [divider, ScrollItem(id, size)],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 }
 
 class ScrollItem extends StatelessWidget {
-  const ScrollItem(this.id, {super.key});
+  const ScrollItem(this.id, this.size, {super.key});
   final int id;
+  final Size size;
 
   @override
   Widget build(context) {
-    int index = context.dex.listIndex + id;
-    bool isPicked = context.dex.menuIndex == id;
-    Pokemon pokemon = context.dex.get(index);
+    final Dex dex = context.dex;
+    final bool flag = dex.index == id;
 
-    return Transform.scale(
-      scale: isPicked ? 1 : 0.8,
-      child: Align(
+    final Species pkmn = dex.getSpecies(id);
+
+    return Expanded(
+      child: Container(
+        width: size.width / 3,
+        // height: size.width / menuCount,
         alignment: Alignment.center,
-        child: Container(
-          width: (isPicked) ? 200 : 100,
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: Colors.red,
-          ),
-          child: Text(
-            "${pokemon.id}-${pokemon.name}",
-            textAlign: TextAlign.right,
-          ),
+        decoration: BoxDecoration(
+          color: flag ? Colors.black : Colors.red,
+        ),
+        child: Text(
+          "${pkmn.id}-${pkmn.name}",
+          textAlign: TextAlign.right,
+          style: TextStyle(color: flag ? Colors.white : Colors.black),
         ),
       ),
     );

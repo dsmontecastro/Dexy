@@ -10,6 +10,11 @@ class EvolutionChain extends StatelessWidget {
     final String url = chain["species"]["url"];
     final int id = url.getId();
 
-    return Center(child: Row());
+    return Center(
+        child: Row(
+      children: [
+        Text("$id"),
+      ],
+    ));
   }
 }

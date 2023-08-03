@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:pokedex/extensions/num.dart';
 
 import 'db.dart';
 import 'api.dart';
@@ -14,23 +15,19 @@ import 'models/move.dart';
 class Dex with ChangeNotifier {
   //
 
-  static const int _displays = 10;
-  int get displays => _displays;
-
-  final Pokemon fill = Pokemon.filler();
+  static const int menuCount = 10;
 
   // Pokedex Elements ----------------------------------------------------------
 
-  int _listIndex = 0;
-  int _menuIndex = 0;
-  int get listIndex => _listIndex;
-  int get menuIndex => _menuIndex;
+  Species? _curr;
+  Species get curr => _curr ?? Species.filler();
 
-  Pokemon? _pokemon;
-  Pokemon get pokemon => _pokemon ?? fill;
+  List<Species> _pokedex = [];
+  List<Species> get pokedex => _pokedex;
 
-  List<Pokemon> _pokedex = [];
-  List<Pokemon> get pokedex => _pokedex;
+  int _index = 0;
+  int get index => _index;
+  int get count => _pokedex.length;
 
   // Resources -----------------------------------------------------------------
   List<Item> _items = [];
@@ -65,10 +62,9 @@ class Dex with ChangeNotifier {
     bool result = true;
 
     try {
-      _listIndex = 0;
-      _menuIndex = 0;
-      _pokedex = _pokemons;
-      _pokemon = _pokedex[0];
+      _pokedex = _species.where((p) => p.id != 0).toList();
+      _curr = _pokedex[0];
+      _index = 0;
       notifyListeners();
     } catch (err) {
       result = false;
@@ -114,46 +110,31 @@ class Dex with ChangeNotifier {
 
   // Alter Dex & Resources -----------------------------------------------------
 
-  int count() => _pokedex.length;
+  Species getSpecies(int i) {
+    Species? species;
+    if (i.inRange(0, count)) species = _pokedex[i];
+    return species ?? Species.filler();
+  }
 
-  Pokemon get(int index) {
+  Pokemon getPokemon(int i) {
     Pokemon? pokemon;
-    if (index >= 0 && index < _pokedex.length) {
-      pokemon = _pokedex[index];
-    }
-    return pokemon ?? fill;
+    Iterable slot = _pokemons.where((p) => p.id == i);
+    if (slot.isNotEmpty) pokemon = slot.first;
+    return pokemon ?? Pokemon.filler();
   }
 
-  void filter(String filter) {
-    _pokedex = _pokemons.where((p) => p.name.startsWith(filter)).toList();
-    cycleList(0);
-  }
-
-  void cycleList(int index) async {
-    int max = count();
-    _listIndex = index;
-
-    if (listIndex < 0) {
-      _listIndex = 0;
-    } else if (listIndex >= max) {
-      _listIndex = max - 1;
-    }
-
-    _pokemon = _pokedex[_listIndex + menuIndex];
+  void filter(String s) {
+    _index = 0;
+    _pokedex = _species.where((p) => p.name.startsWith(s)).toList();
     notifyListeners();
   }
 
-  void cycleMenu(int index) async {
-    _menuIndex = index;
-
-    if (menuIndex < 0) {
-      _menuIndex = 0;
-    } else if (menuIndex >= displays) {
-      _menuIndex = displays - 1;
+  void scroll(int i) {
+    if (index.inRange(0, count)) {
+      _index = i;
+      _curr = _pokedex[i];
+      notifyListeners();
     }
-
-    _pokemon = _pokedex[_menuIndex];
-    notifyListeners();
   }
 
   // Alter User-Toggled States -------------------------------------------------

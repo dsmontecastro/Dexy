@@ -5,6 +5,7 @@ import 'package:pokedex/extensions/provider.dart';
 
 // import 'package:pokedex/extensions/string.dart';
 // import 'package:pokedex/database/models/item.dart';
+import 'package:pokedex/database/models/species.dart';
 import 'package:pokedex/database/models/pokemon.dart';
 
 class MainItem extends StatelessWidget {
@@ -12,7 +13,7 @@ class MainItem extends StatelessWidget {
 
   @override
   Widget build(context) {
-    Pokemon pokemon = context.dex.pokemon;
+    // Species curr = context.dex.curr;
 
     // return Center(child: Text(pokemon.name));
     return const Center(
@@ -51,7 +52,9 @@ class PokemonSpriteState extends State<PokemonSprite> {
 
   @override
   Widget build(context) {
-    Pokemon pokemon = context.dex.pokemon;
+    Species species = context.dex.curr;
+    Pokemon pokemon = context.db.getPokemon(species.id);
+
     String? sprite = pokemon.sprite;
     String? shiny = pokemon.shiny;
     bool online = context.online;
