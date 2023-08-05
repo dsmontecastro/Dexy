@@ -51,7 +51,7 @@ web
 windows
 
 # Hidden
-# **/old
+**/old
 
 # Force Show
 .dart_tool/*
