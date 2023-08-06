@@ -14,7 +14,8 @@ extension Providers on BuildContext {
   ];
 
   // Shortcuts for Drawers Provider
-  GlobalKey<ScaffoldState> get key => watch<Drawers>().key;
+  GlobalKey<ScaffoldState> get navKey => watch<Drawers>().navKey;
+  GlobalKey<ScaffoldState> get sideKey => watch<Drawers>().sideKey;
   void drawSide() => read<Drawers>().drawSide();
   void drawNav() => read<Drawers>().drawNav();
 

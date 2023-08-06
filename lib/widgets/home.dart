@@ -1,43 +1,30 @@
 import 'package:flutter/material.dart';
 
-import 'body.dart';
-import 'home/appbar.dart';
-import 'home/drawer.dart';
+import 'item/item.dart';
+import 'side/side.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   const Home({super.key});
 
-  @override
-  HomeState createState() => HomeState();
-}
-
-class HomeState extends State<Home> {
-  final GlobalKey<ScaffoldState> drawerKey = GlobalKey();
-  final TextEditingController searchController = TextEditingController();
-
-  void draw() {
-    setState(() {
-      ScaffoldState? key = drawerKey.currentState;
-      if (key != null) {
-        if (key.isDrawerOpen) {
-          key.closeDrawer();
-        } else {
-          key.openDrawer();
-        }
-      }
-    });
-  }
+  // static const _children = [Item(), Side()];
+  static const _children = [Item(), Text("TEMP")];
 
   @override
   Widget build(context) {
-    final double width = MediaQuery.of(context).size.width;
-
     return MaterialApp(
-      home: Scaffold(
-        key: drawerKey,
-        body: const Body(),
-        appBar: appBar(draw),
-        drawer: CustomDrawer(draw, width),
+      home: OrientationBuilder(
+        builder: (context, orientation) {
+          final bool flag = orientation == Orientation.portrait;
+          final Axis direction = flag ? Axis.vertical : Axis.horizontal;
+
+          return Flex(
+              direction: direction,
+              mainAxisSize: MainAxisSize.max,
+              children: List.generate(
+                _children.length,
+                (i) => Expanded(child: _children[i]),
+              ));
+        },
       ),
     );
   }

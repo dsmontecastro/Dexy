@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Drawers extends ChangeNotifier {
-  static final GlobalKey<ScaffoldState> _key = GlobalKey();
-  GlobalKey<ScaffoldState> get key => _key;
+  static final GlobalKey<ScaffoldState> _navKey = GlobalKey();
+  static final GlobalKey<ScaffoldState> _sideKey = GlobalKey();
+
+  GlobalKey<ScaffoldState> get navKey => _navKey;
+  GlobalKey<ScaffoldState> get sideKey => _sideKey;
 
   void drawNav() {
-    ScaffoldState? state = _key.currentState;
+    ScaffoldState? state = _navKey.currentState;
     if (state != null && state.hasDrawer) {
       if (state.isDrawerOpen) {
         state.closeDrawer();
@@ -16,7 +19,7 @@ class Drawers extends ChangeNotifier {
   }
 
   void drawSide() {
-    ScaffoldState? state = _key.currentState;
+    ScaffoldState? state = _sideKey.currentState;
     if (state != null && state.hasEndDrawer) {
       if (state.isEndDrawerOpen) {
         state.closeEndDrawer();
