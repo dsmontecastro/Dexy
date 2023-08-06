@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:pokedex/providers/dex.dart';
-import 'package:pokedex/extensions/providers.dart';
-import 'package:pokedex/database/models/species.dart';
-
 import 'side/_test.dart';
-
-const int menuCount = Dex.menuCount;
-const int rad = menuCount ~/ 2;
+import 'side/transition.dart';
 
 class Side extends StatefulWidget {
   const Side({super.key});
@@ -21,19 +15,16 @@ class SideState extends State<Side> {
   static const Icon _iconRight = Icon(Icons.arrow_right);
   static const Duration _duration = Duration(microseconds: 50);
 
-  int _page = 0;
-  static const int _pageCount = 5;
   final PageController _controller = PageController(initialPage: 0);
+  final List<Widget> _pages = testPages;
+  int _page = 0;
 
-  static final List<Widget> _pages = List.generate(
-    _pageCount,
-    (index) => Expanded(child: Center(child: Test(index + 1))),
-  );
+  void nextPage() => swapPage(1);
+  void prevPage() => swapPage(-1);
 
   void swapPage(int i) {
     setState(() {
-      // debugPrint("Page: $_page to ${_page + i}");
-      _page = (_page + i) % _pageCount;
+      _page = (_page + i) % _pages.length;
       _controller.animateToPage(
         _page,
         curve: Curves.ease,
@@ -42,12 +33,10 @@ class SideState extends State<Side> {
     });
   }
 
-  void nextPage() => swapPage(1);
-  void prevPage() => swapPage(-1);
-
   @override
   Widget build(context) {
     // Build Proper
+    // final Size size = MediaQuery.of(context).size;
 
     Widget stack = Stack(
       fit: StackFit.expand,
@@ -57,13 +46,21 @@ class SideState extends State<Side> {
           controller: _controller,
           children: _pages,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            PageButton(_iconLeft, prevPage),
-            PageButton(_iconRight, nextPage),
-          ],
+        Center(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.amber.withOpacity(0.1),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                PageButton(_iconLeft, prevPage),
+                PageButton(_iconRight, nextPage),
+              ],
+            ),
+          ),
         ),
+        LayoutBuilder(builder: (context, constraints) => Transition(constraints)),
       ],
     );
 
