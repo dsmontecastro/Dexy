@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'body/main_item.dart';
-import 'body/scroll_menu.dart';
+import 'body/item/_item.dart';
+import 'body/side/_side.dart';
 
 class Body extends StatelessWidget {
   const Body({super.key});
 
-  static const List<Widget> children = [MainItem(), ScrollMenu()];
+  static const List<Widget> children = [Item(), Side()];
 
   @override
   Widget build(context) {
