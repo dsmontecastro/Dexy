@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'body/item/_item.dart';
-import 'body/side/_side.dart';
+import 'body/item.dart';
+import 'body/side.dart';
 
 class Body extends StatelessWidget {
   const Body({super.key});
