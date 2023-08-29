@@ -30,6 +30,7 @@ class Dex with ChangeNotifier {
   int get count => _pokedex.length;
 
   // Resources -----------------------------------------------------------------
+
   List<Item> _items = [];
   List<Move> _moves = [];
   List<Species> _species = [];
@@ -110,13 +111,25 @@ class Dex with ChangeNotifier {
 
   // Alter Dex & Resources -----------------------------------------------------
 
+  Pokemon getCurrentPokemon() {
+    Pokemon pokemon = Pokemon.filler();
+    List<int> varieties = curr.varieties;
+
+    if (varieties.isNotEmpty) {
+      int id = varieties[0];
+      pokemon = _pokemons[id];
+    }
+
+    return pokemon;
+  }
+
   Species getSpecies(int i) {
     Species? species;
     if (i.inRange(0, count)) species = _pokedex[i];
     return species ?? Species.filler();
   }
 
-  Pokemon getPokemon(int i) {
+  Pokemon getPokemon(int? i) {
     Pokemon? pokemon;
     Iterable slot = _pokemons.where((p) => p.id == i);
     if (slot.isNotEmpty) pokemon = slot.first;
