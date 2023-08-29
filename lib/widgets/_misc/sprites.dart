@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Sprites {
   //
 
-  static final String _sprite = "assets/sprites/_sprite.png";
+  static const String _sprite = "assets/sprites/_sprite.png";
 
   static Image getSprite(String? url, double side) {
     if (url == null) {
