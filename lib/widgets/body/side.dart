@@ -1,6 +1,9 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import 'side/_test.dart';
+import 'side/_pages.dart';
 import 'side/transition.dart';
 
 class Side extends StatefulWidget {
@@ -10,40 +13,83 @@ class Side extends StatefulWidget {
   SideState createState() => SideState();
 }
 
-class SideState extends State<Side> {
-  static const Icon _iconLeft = Icon(Icons.arrow_left);
+class SideState extends State<Side> with TickerProviderStateMixin {
   static const Icon _iconRight = Icon(Icons.arrow_right);
-  static const Duration _duration = Duration(microseconds: 50);
+  static const Icon _iconLeft = Icon(Icons.arrow_left);
 
-  final PageController _controller = PageController(initialPage: 0);
-  final List<Widget> _pages = testPages;
+  // Transition Animation Elements ---------------------------------------------
+
+  static const _duration = Duration(milliseconds: 150);
+  static const _reverseDuration = Duration(milliseconds: 100);
+
+  bool _animating = false;
+
+  late final AnimationController _animControl = AnimationController(
+    vsync: this,
+    duration: _duration,
+    reverseDuration: _reverseDuration,
+    animationBehavior: AnimationBehavior.preserve,
+  );
+
+  void transition() {
+    _animControl.forward();
+    Timer(_duration * 2.5, () {
+      _animControl.reverse();
+    });
+  }
+
+  // PageView Elements ---------------------------------------------------------
+
+  final PageController _pageControl = PageController(initialPage: 0);
+  final List<Widget> _pages = pageList;
   int _page = 0;
 
   void nextPage() => swapPage(1);
   void prevPage() => swapPage(-1);
 
+  void turnPage(int i) {
+    if (!_animating) {
+      setState(() {
+        _page = (_page + i) % _pages.length;
+        _pageControl.animateToPage(
+          _page,
+          curve: Curves.linear,
+          duration: _duration,
+        );
+        Timer(_duration * 2, () {
+          _animating = false;
+        });
+      });
+    }
+  }
+
   void swapPage(int i) {
-    setState(() {
-      _page = (_page + i) % _pages.length;
-      _controller.animateToPage(
-        _page,
-        curve: Curves.ease,
-        duration: _duration,
-      );
-    });
+    if (!_animating) {
+      setState(() => _animating = true);
+      transition();
+      Timer(_duration * 2.75, () {
+        setState(() {
+          _page = (_page + i) % _pages.length;
+          _pageControl.jumpToPage(_page);
+          Timer(_duration * 2, () {
+            _animating = false;
+          });
+        });
+      });
+    }
   }
 
   @override
   Widget build(context) {
     // Build Proper
-    // final Size size = MediaQuery.of(context).size;
 
     Widget stack = Stack(
       fit: StackFit.expand,
       children: [
         PageView(
+          dragStartBehavior: DragStartBehavior.start,
           physics: const ScrollPhysics(),
-          controller: _controller,
+          controller: _pageControl,
           children: _pages,
         ),
         Center(
@@ -60,7 +106,14 @@ class SideState extends State<Side> {
             ),
           ),
         ),
-        LayoutBuilder(builder: (context, constraints) => Transition(constraints)),
+        // IgnorePointer(
+        //   child: LayoutBuilder(
+        //     builder: (context, constraints) => Transition(
+        //       constraints,
+        //       _animControl,
+        //     ),
+        //   ),
+        // ),
       ],
     );
 
@@ -68,11 +121,24 @@ class SideState extends State<Side> {
       width: double.infinity,
       height: double.infinity,
       alignment: Alignment.centerLeft,
-      // padding: EdgeInsets.symmetric(vertical: size.height / 15),
       decoration: const BoxDecoration(
         color: Colors.green,
       ),
-      child: stack,
+      child: GestureDetector(
+        onHorizontalDragEnd: (details) {
+          const int sens = 500;
+          final double? velocity = details.primaryVelocity;
+          debugPrint(velocity.toString());
+          if (velocity != null) {
+            if (velocity < -sens) {
+              turnPage(1);
+            } else if (velocity > sens) {
+              turnPage(-1);
+            }
+          }
+        },
+        child: stack,
+      ),
     );
   }
 }
