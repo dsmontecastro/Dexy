@@ -6,17 +6,17 @@ import 'package:pokedex/extensions/providers.dart';
 import 'package:pokedex/database/models/species.dart';
 import 'package:pokedex/database/models/pokemon.dart';
 
-import 'background.dart';
+import 'sprite_bg.dart';
 
-class PokemonSprite extends StatefulWidget {
-  const PokemonSprite(this.side, {super.key});
+class PKMNSprite extends StatefulWidget {
+  const PKMNSprite(this.side, {super.key});
   final double side;
 
   @override
-  PokemonSpriteState createState() => PokemonSpriteState();
+  PKMNSpriteState createState() => PKMNSpriteState();
 }
 
-class PokemonSpriteState extends State<PokemonSprite> {
+class PKMNSpriteState extends State<PKMNSprite> {
   static const Icon icon = Icon(Icons.abc);
   bool isShiny = false;
 

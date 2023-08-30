@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'item/sprite.dart';
+import 'item/pkmn_sprite.dart';
 
-class Item extends StatelessWidget {
-  const Item({super.key});
+class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
 
   @override
   Widget build(context) {
@@ -14,7 +14,7 @@ class Item extends StatelessWidget {
       child: const Center(
         child: Column(
           children: [
-            Expanded(child: PokemonSprite(300)),
+            Expanded(child: PKMNSprite(300)),
           ],
         ),
       ),

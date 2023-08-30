@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'side/_pages.dart';
 import 'side/transition.dart';
 
-class Side extends StatefulWidget {
-  const Side({super.key});
+class SideScreen extends StatefulWidget {
+  const SideScreen({super.key});
 
   @override
-  SideState createState() => SideState();
+  SideScreenState createState() => SideScreenState();
 }
 
-class SideState extends State<Side> with TickerProviderStateMixin {
+class SideScreenState extends State<SideScreen> with TickerProviderStateMixin {
   static const Icon _iconRight = Icon(Icons.arrow_right);
   static const Icon _iconLeft = Icon(Icons.arrow_left);
 

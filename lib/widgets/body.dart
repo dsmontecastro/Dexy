@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'body/item.dart';
-import 'body/side.dart';
+import 'body/main_screen.dart';
+import 'body/side_screen.dart';
 
 class Body extends StatelessWidget {
   const Body({super.key});
 
-  static const List<Widget> children = [Item(), Side()];
+  static const List<Widget> children = [MainScreen(), SideScreen()];
 
   @override
   Widget build(context) {
