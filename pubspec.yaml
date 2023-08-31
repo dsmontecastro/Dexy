@@ -69,8 +69,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/hex.png
-    - assets/images/logo.svg
+    - assets/images/
     - assets/pokemon/icons/
     - assets/pokemon/shinies/
     - assets/pokemon/sprites/
