@@ -102,38 +102,24 @@ extension API on DB {
           await upsert<Evolution>(tableName, Evolution.fromAPI(map));
         } else if (tableName == moveModel) {
           await upsert<Move>(tableName, Move.fromAPI(map));
-        } else if (tableName == speciesModel) {
-          await upsert<Species>(tableName, Species.fromAPI(map));
-
-          // Item Model has special columns
-        } else if (tableName == itemModel) {
+        } else if (tableName == pokemonModel) {
+          await upsert<Pokemon>(tableName, Pokemon.fromAPI(map));
           //
 
-          // Get & Convert Sprites
+          // ItemModel has Custom Fields
+        } else if (tableName == itemModel) {
           String? spriteURL = map["sprites"]["default"];
           String? sprite = await getSprite(spriteURL);
           map[ItemFields.sprite] = sprite;
-
           await upsert<Item>(tableName, Item.fromAPI(map));
-
-          // Pokemon Model has special columns
-        } else if (tableName == pokemonModel) {
           //
 
-          // Save User-Toggled Fields
-          Pokemon pokemon = await getById(tableName, map[PokemonFields.id]);
-          map[PokemonFields.favorite] = pokemon.favorite;
-          map[PokemonFields.caught] = pokemon.caught;
-
-          // Get & Convert Sprites
-          Map<String, dynamic> sprites = map["sprites"];
-          map[PokemonFields.icon] = sprites["front_default"];
-
-          Map<String, dynamic> official = sprites["other"]["official-artwork"];
-          map[PokemonFields.shiny] = official["front_shiny"];
-          map[PokemonFields.sprite] = official["front_default"];
-
-          await upsert<Pokemon>(tableName, Pokemon.fromAPI(map));
+          // SpeciesModel has Custom Fields
+        } else if (tableName == speciesModel) {
+          Species species = await getById(tableName, map[PokemonFields.id]);
+          map[SpeciesFields.favorite] = species.favorite;
+          map[SpeciesFields.caught] = species.caught;
+          await upsert<Species>(tableName, Species.fromAPI(map));
         }
       }
 

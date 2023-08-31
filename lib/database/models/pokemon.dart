@@ -16,15 +16,8 @@ class Pokemon implements Model {
   @override
   int getId() => id;
 
-  // Strings
+  // Non-Integers
   final String name;
-  final String? icon;
-  final String? shiny;
-  final String? sprite;
-
-  // Booleans
-  bool caught;
-  bool favorite;
   final bool isDefault;
 
   // Integers
@@ -55,11 +48,6 @@ class Pokemon implements Model {
   // Core Constructor
   Pokemon(
       {required this.name,
-      required this.icon,
-      required this.shiny,
-      required this.sprite,
-      this.caught = false,
-      this.favorite = false,
       required this.isDefault,
       required this.id,
       required this.order,
@@ -80,12 +68,7 @@ class Pokemon implements Model {
   // Filler Constructor
   Pokemon.filler()
       : name = blank,
-        icon = null,
-        shiny = null,
-        sprite = null,
         isDefault = false,
-        favorite = false,
-        caught = false,
         id = 0,
         order = 0,
         height = 0,
@@ -106,12 +89,7 @@ class Pokemon implements Model {
   @override
   Pokemon.fromAPI(Map<String, dynamic> json)
       : name = json[PokemonFields.name],
-        icon = json[PokemonFields.icon],
-        shiny = json[PokemonFields.shiny],
-        sprite = json[PokemonFields.sprite],
         isDefault = json[PokemonFields.isDefault],
-        favorite = json[PokemonFields.favorite],
-        caught = json[PokemonFields.caught],
         id = json[PokemonFields.id],
         order = json["order"], // problematic string in DB
         height = json[PokemonFields.height],
@@ -131,12 +109,7 @@ class Pokemon implements Model {
   @override
   Pokemon.fromDB(Map<String, dynamic> json)
       : name = json[PokemonFields.name],
-        icon = json[PokemonFields.icon],
-        shiny = json[PokemonFields.shiny],
-        sprite = json[PokemonFields.sprite],
         isDefault = json[PokemonFields.isDefault] == 1,
-        favorite = json[PokemonFields.favorite] == 1,
-        caught = json[PokemonFields.caught] == 1,
         id = json[PokemonFields.id],
         order = json[PokemonFields.order],
         height = json[PokemonFields.height],
@@ -156,12 +129,7 @@ class Pokemon implements Model {
   @override
   Map<String, dynamic> toDB() => {
         PokemonFields.name: name,
-        PokemonFields.icon: icon,
-        PokemonFields.shiny: shiny,
-        PokemonFields.sprite: sprite,
         PokemonFields.isDefault: isDefault ? 1 : 0,
-        PokemonFields.favorite: favorite ? 1 : 0,
-        PokemonFields.caught: caught ? 1 : 0,
         PokemonFields.id: id,
         PokemonFields.order: order,
         PokemonFields.height: height,
@@ -269,15 +237,8 @@ class Pokemon implements Model {
 class PokemonFields {
   const PokemonFields();
 
-  // Strings
+  // Non-Integers
   static const String name = "name";
-  static const String icon = "icon";
-  static const String shiny = "shiny";
-  static const String sprite = "sprite";
-
-  // Booleans
-  static const String caught = "caught";
-  static const String favorite = "favorite";
   static const String isDefault = "is_default";
 
   // Standard Integers
@@ -306,11 +267,6 @@ class PokemonFields {
   // List of All Fields
   static const List<String> fields = [
     name,
-    icon,
-    shiny,
-    sprite,
-    caught,
-    favorite,
     isDefault,
     id,
     order,
@@ -334,11 +290,6 @@ const String pokemonMaker = """
   CREATE TABLE IF NOT EXISTS $pokemonModel(
     ${PokemonFields.id} INTEGER PRIMARY KEY NOT NULL,
     ${PokemonFields.name} TEXT NOT NULL,
-    ${PokemonFields.icon} TEXT,
-    ${PokemonFields.shiny} TEXT,
-    ${PokemonFields.sprite} TEXT,
-    ${PokemonFields.caught} INTEGER NOT NULL,
-    ${PokemonFields.favorite} INTEGER NOT NULL,
     ${PokemonFields.isDefault} INTEGER NOT NULL,
     ${PokemonFields.order} INTEGER NOT NULL,
     ${PokemonFields.height} INTEGER NOT NULL,

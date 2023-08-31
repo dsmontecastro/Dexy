@@ -19,11 +19,13 @@ class Species implements Model {
   final String growthRate;
 
   // Booleans
+  bool caught;
+  bool favorite;
+  final bool isBaby;
+  final bool isMythical;
+  final bool isLegendary;
   final bool hasAlter;
   final bool hasForms;
-  final bool isLegendary;
-  final bool isMythical;
-  final bool isBaby;
 
   // Integers
   final int id;
@@ -45,11 +47,13 @@ class Species implements Model {
       required this.text,
       required this.genus,
       required this.growthRate,
+      required this.caught,
+      required this.favorite,
+      required this.isBaby,
+      required this.isMythical,
+      required this.isLegendary,
       required this.hasAlter,
       required this.hasForms,
-      required this.isLegendary,
-      required this.isMythical,
-      required this.isBaby,
       required this.id,
       required this.order,
       required this.happiness,
@@ -64,11 +68,13 @@ class Species implements Model {
         text = "_",
         genus = "_",
         growthRate = "_",
+        caught = false,
+        favorite = false,
+        isBaby = false,
+        isMythical = false,
+        isLegendary = false,
         hasAlter = false,
         hasForms = false,
-        isLegendary = false,
-        isMythical = false,
-        isBaby = false,
         id = 0,
         order = 0,
         happiness = 0,
@@ -86,11 +92,13 @@ class Species implements Model {
         text = _getLang(json, SpeciesFields.texts, SpeciesFields.text),
         genus = _getLang(json, SpeciesFields.genera, SpeciesFields.genus),
         growthRate = json[SpeciesFields.growthRate]["name"],
+        caught = json[SpeciesFields.caught],
+        favorite = json[SpeciesFields.favorite],
+        isBaby = json[SpeciesFields.isBaby],
+        isMythical = json[SpeciesFields.isMythical],
+        isLegendary = json[SpeciesFields.isLegendary],
         hasAlter = json[SpeciesFields.hasAlter],
         hasForms = json[SpeciesFields.hasForms],
-        isLegendary = json[SpeciesFields.isLegendary],
-        isMythical = json[SpeciesFields.isMythical],
-        isBaby = json[SpeciesFields.isBaby],
         id = json[SpeciesFields.id],
         order = json["order"] ?? 0, // problematic string in DB
         happiness = json[SpeciesFields.happiness] ?? 0, // Nullable in later Gens
@@ -105,11 +113,13 @@ class Species implements Model {
         text = json[SpeciesFields.text],
         genus = json[SpeciesFields.genus],
         growthRate = json[SpeciesFields.growthRate],
+        caught = json[SpeciesFields.caught] == 1,
+        favorite = json[SpeciesFields.favorite] == 1,
+        isBaby = json[SpeciesFields.isBaby] == 1,
+        isMythical = json[SpeciesFields.isMythical] == 1,
+        isLegendary = json[SpeciesFields.isLegendary] == 1,
         hasAlter = json[SpeciesFields.hasAlter] == 1,
         hasForms = json[SpeciesFields.hasForms] == 1,
-        isLegendary = json[SpeciesFields.isLegendary] == 1,
-        isMythical = json[SpeciesFields.isMythical] == 1,
-        isBaby = json[SpeciesFields.isBaby] == 1,
         id = json[SpeciesFields.id],
         order = json[SpeciesFields.order],
         happiness = json[SpeciesFields.happiness],
@@ -125,11 +135,13 @@ class Species implements Model {
         SpeciesFields.text: text,
         SpeciesFields.genus: genus,
         SpeciesFields.growthRate: growthRate,
+        SpeciesFields.caught: caught ? 1 : 0,
+        SpeciesFields.favorite: favorite ? 1 : 0,
+        SpeciesFields.isBaby: isBaby ? 1 : 0,
+        SpeciesFields.isMythical: isMythical ? 1 : 0,
+        SpeciesFields.isLegendary: isLegendary ? 1 : 0,
         SpeciesFields.hasAlter: hasAlter ? 1 : 0,
         SpeciesFields.hasForms: hasForms ? 1 : 0,
-        SpeciesFields.isLegendary: isLegendary ? 1 : 0,
-        SpeciesFields.isMythical: isMythical ? 1 : 0,
-        SpeciesFields.isBaby: isBaby ? 1 : 0,
         SpeciesFields.id: id,
         SpeciesFields.order: order,
         SpeciesFields.happiness: happiness,
@@ -180,32 +192,34 @@ class SpeciesFields {
   const SpeciesFields();
 
   // Strings
-  static const name = "name";
-  static const text = "flavor_text";
-  static const genus = "genus";
-  static const growthRate = "growth_rate";
+  static const String name = "name";
+  static const String text = "flavor_text";
+  static const String genus = "genus";
+  static const String growthRate = "growth_rate";
 
-  static const texts = "flavor_text_entries"; // Not a column
-  static const genera = "genera"; // Not a column
+  static const String texts = "flavor_text_entries"; // Not a column
+  static const String genera = "genera"; // Not a column
 
   // Booleans
-  static const hasAlter = "has_gender_differences";
-  static const hasForms = "forms_switchable";
-  static const isLegendary = "is_legendary";
-  static const isMythical = "is_mythical";
-  static const isBaby = "is_baby";
+  static const String caught = "caught";
+  static const String favorite = "favorite";
+  static const String isBaby = "is_baby";
+  static const String isMythical = "is_mythical";
+  static const String isLegendary = "is_legendary";
+  static const String hasAlter = "has_gender_differences";
+  static const String hasForms = "forms_switchable";
 
   // Integers
-  static const id = "id";
-  static const order = "ordera";
-  static const happiness = "base_happiness";
-  static const catchRate = "capture_rate";
-  static const genderRate = "gender_rate";
-  static const generation = "generation";
+  static const String id = "id";
+  static const String order = "ordera";
+  static const String happiness = "base_happiness";
+  static const String catchRate = "capture_rate";
+  static const String genderRate = "gender_rate";
+  static const String generation = "generation";
 
   // Foreign Keys
-  static const evolutions = "evolution_chain";
-  static const varieties = "varieties";
+  static const String evolutions = "evolution_chain";
+  static const String varieties = "varieties";
 
   // List of All Fields
   static const List<String> fields = [
@@ -213,11 +227,13 @@ class SpeciesFields {
     text,
     genus,
     growthRate,
+    caught,
+    favorite,
+    isBaby,
+    isMythical,
+    isLegendary,
     hasAlter,
     hasForms,
-    isLegendary,
-    isMythical,
-    isBaby,
     id,
     order,
     happiness,
@@ -236,11 +252,13 @@ const String speciesMaker = """
     ${SpeciesFields.text} TEXT NOT NULL,
     ${SpeciesFields.genus} TEXT NOT NULL,
     ${SpeciesFields.growthRate} TEXT NOT NULL,
+    ${SpeciesFields.caught} INTEGER NOT NULL DEFAULT 0,
+    ${SpeciesFields.favorite} INTEGER NOT NULL DEFAULT 0,
+    ${SpeciesFields.isBaby} INTEGER NOT NULL,
+    ${SpeciesFields.isMythical} INTEGER NOT NULL,
+    ${SpeciesFields.isLegendary} INTEGER NOT NULL,
     ${SpeciesFields.hasAlter} INTEGER NOT NULL,
     ${SpeciesFields.hasForms} INTEGER NOT NULL,
-    ${SpeciesFields.isLegendary} INTEGER NOT NULL,
-    ${SpeciesFields.isMythical} INTEGER NOT NULL,
-    ${SpeciesFields.isBaby} INTEGER NOT NULL,
     ${SpeciesFields.order} INTEGER NOT NULL,
     ${SpeciesFields.happiness} INTEGER NOT NULL,
     ${SpeciesFields.catchRate} INTEGER NOT NULL,

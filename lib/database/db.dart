@@ -2,7 +2,7 @@ import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart';
 
 import 'models/_model.dart';
-import 'models/pokemon.dart';
+import 'models/species.dart';
 
 class DB {
   //
@@ -158,26 +158,26 @@ class DB {
 
   // Favorite/Caught Toggles ---------------------------------------------------
 
-  Future<int> toggleFavorite(Pokemon pokemon) async {
+  Future<int> toggleFavorite(Species species) async {
     final Database? db = await instance.database;
-    pokemon.favorite = !pokemon.favorite;
+    species.favorite = !species.favorite;
     return await db!.update(
-      pokemonModel,
-      pokemon.toDB(),
+      speciesModel,
+      species.toDB(),
       where: "id = ?",
-      whereArgs: [pokemon.id],
+      whereArgs: [species.id],
     );
   }
 
-  Future<int> toggleCaught(Pokemon pokemon) async {
+  Future<int> toggleCaught(Species species) async {
     final Database? db = await instance.database;
-    pokemon.caught = !pokemon.caught;
+    species.caught = !species.caught;
 
     return await db!.update(
-      pokemonModel,
-      pokemon.toDB(),
+      speciesModel,
+      species.toDB(),
       where: "id = ?",
-      whereArgs: [pokemon.id],
+      whereArgs: [species.id],
     );
   }
 

@@ -152,18 +152,18 @@ class Dex with ChangeNotifier {
 
   // Alter User-Toggled States -------------------------------------------------
 
-  Future<bool> favorite(Pokemon mon) async {
+  Future<bool> favorite(Species s) async {
     try {
-      await DB.instance.toggleFavorite(mon);
+      await DB.instance.toggleFavorite(s);
       return true;
     } catch (err) {
       return false;
     }
   }
 
-  Future<bool> caught(Pokemon mon) async {
+  Future<bool> caught(Species s) async {
     try {
-      await DB.instance.toggleCaught(mon);
+      await DB.instance.toggleCaught(s);
       return true;
     } catch (err) {
       return false;

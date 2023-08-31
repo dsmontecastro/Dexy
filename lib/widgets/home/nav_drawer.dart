@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:pokedex/extensions/providers.dart';
-// import 'package:pokedex/database/models/_model.dart';
+import 'package:pokedex/database/models/_model.dart';
 
 const Icon back = Icon(Icons.arrow_back);
 const Icon load = Icon(Icons.refresh);
@@ -29,6 +29,13 @@ class NavDrawer extends StatelessWidget {
             icon: load,
             alignment: Alignment.bottomLeft,
             onPressed: () => {},
+            // onPressed: () {
+            //   print("DEBUGGING!");
+            //   // context.db.drop(Models.pokemon);
+            //   // context.db.callAPI(table: Models.pokemon);
+            //   context.db.drop(Models.species);
+            //   context.db.callAPI(table: Models.species);
+            // },
           ),
         ],
       ),
