@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'package:pokedex/types/enums/typing.dart';
-import 'package:pokedex/extensions/providers.dart';
 import 'package:pokedex/database/models/pokemon.dart';
 
-class SpriteBG extends StatelessWidget {
-  const SpriteBG({super.key});
+class Background extends StatelessWidget {
+  const Background(this.pokemon, {super.key});
+  final Pokemon pokemon;
 
   @override
   Widget build(context) {
-    //
-
-    final Pokemon pokemon = context.dex.getCurrentPokemon();
     final Color type1 = pokemon.type1.color;
     final Color type2 = pokemon.type2.color;
 

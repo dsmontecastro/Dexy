@@ -1,20 +1,39 @@
 import 'package:flutter/material.dart';
 
-class Sprites {
-  //
+class SpriteHandler {
+  // Getter Service for creating Pokemon Sprites, Shinies, and Icons
 
-  static const String _sprite = "assets/sprites/_sprite.png";
+  // Path Information ----------------------------------------------------------
 
-  static Image getSprite(String? url, double side) {
-    if (url == null) {
-      return Image.asset(_sprite, width: side, height: side);
-    } else {
-      return Image.network(url, width: side, height: side);
-    }
+  static const String _path = "assets/pokemon";
+  static const String _icons = "$_path/icons";
+  static const String _shinies = "$_path/shinies";
+  static const String _sprites = "$_path/sprites";
+
+  // Primary Function ----------------------------------------------------------
+
+  static Image getAsset(String type, int id) {
+    return Image.asset(
+      "$type/$id.png",
+      fit: BoxFit.cover,
+      filterQuality: FilterQuality.high,
+      errorBuilder: (context, error, stackTrace) {
+        return Image.asset("$type/0.png");
+      },
+    );
   }
 
-  // static Image getSprite(String? url, {bool online = true}) {
-  //   if (!online || url == null) return _sprite;
-  //   return Image.network(url);
-  // }
+  // Specific Functions --------------------------------------------------------
+
+  static Image getIcon(int id) {
+    return getAsset(_icons, id);
+  }
+
+  static Image getShiny(int id) {
+    return getAsset(_shinies, id);
+  }
+
+  static Image getSprite(int id) {
+    return getAsset(_sprites, id);
+  }
 }
