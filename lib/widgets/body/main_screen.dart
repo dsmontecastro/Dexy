@@ -51,8 +51,8 @@ class MainScreenState extends State<MainScreen> {
               flex: 6,
               child: Stack(
                 children: [
-                  PKMNSprite(id),
                   Background(pokemon),
+                  PKMNSprite(id),
                 ],
               ),
             ),

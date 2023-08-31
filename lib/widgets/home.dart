@@ -40,13 +40,16 @@ class Home extends StatelessWidget {
         // AppBar Design
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(appbarHeight),
+
+          // AppBar Proper
           child: AppBar(
             elevation: 10.0,
             toolbarHeight: appbarHeight,
             automaticallyImplyLeading: false,
             shadowColor: Colors.transparent,
 
-            actions: [Container()], // Removes trailing icons
+            // Removes trailing icons
+            actions: [Container()],
 
             // Title: Search Widget
             centerTitle: true,
@@ -66,9 +69,15 @@ class Home extends StatelessWidget {
               icon: logo,
               onPressed: context.drawNav,
             ),
+
+            //
           ),
+
+          //
         ),
       ),
+
+      //
     );
   }
 }
