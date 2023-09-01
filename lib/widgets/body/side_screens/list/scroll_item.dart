@@ -12,7 +12,7 @@ class ScrollItem extends StatelessWidget {
   @override
   Widget build(context) {
     final Dex dex = context.dex;
-    final bool flag = dex.index == id;
+    final bool flag = dex.dexIndex == id;
 
     final Species pkmn = dex.getSpecies(id);
 

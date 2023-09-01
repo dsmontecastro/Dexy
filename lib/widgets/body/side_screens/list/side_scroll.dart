@@ -25,7 +25,7 @@ class SideScrollState extends State<SideScroll> {
 
   @override
   void initState() {
-    limit = context.db.count;
+    limit = context.db.dexCount;
     super.initState();
   }
 
@@ -84,7 +84,7 @@ class SideScrollState extends State<SideScroll> {
           scrollDirection: Axis.vertical,
 
           // Item Properties
-          itemCount: context.dex.count,
+          itemCount: context.dex.dexCount,
           itemBuilder: (_, id) {
             return Padding(
               padding: EdgeInsets.only(left: size.width / 8),
