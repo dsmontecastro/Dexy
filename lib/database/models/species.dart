@@ -82,7 +82,7 @@ class Species implements Model {
         genderRate = 0,
         generation = Generation.error,
         evolutions = 0,
-        varieties = [];
+        varieties = [0];
 
   // JSON Parsing
 

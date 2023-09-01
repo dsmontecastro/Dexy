@@ -19,15 +19,25 @@ class Dex with ChangeNotifier {
 
   // Pokedex Elements ----------------------------------------------------------
 
-  Species? _curr;
-  Species get curr => _curr ?? Species.filler();
-
   List<Species> _pokedex = [];
   List<Species> get pokedex => _pokedex;
 
-  int _index = 0;
-  int get index => _index;
-  int get count => _pokedex.length;
+  Species? _entry;
+  Species get entry => _entry ?? Species.filler();
+
+  int _dexIndex = 0;
+  int get dexIndex => _dexIndex;
+  int get dexCount => _pokedex.length;
+
+  List<Pokemon> _forms = [Pokemon.filler()];
+  List<Pokemon> get forms => _forms;
+
+  Pokemon? _form;
+  Pokemon get form => _form ?? Pokemon.filler();
+
+  int _formIndex = 0;
+  int get formIndex => _formIndex;
+  int get formCount => forms.length;
 
   // Resources -----------------------------------------------------------------
 
@@ -64,9 +74,7 @@ class Dex with ChangeNotifier {
 
     try {
       _pokedex = _species.where((p) => p.id != 0).toList();
-      _curr = _pokedex[0];
-      _index = 0;
-      notifyListeners();
+      scroll(0); // Will Notify
     } catch (err) {
       result = false;
     }
@@ -109,23 +117,45 @@ class Dex with ChangeNotifier {
     return success;
   }
 
-  // Alter Dex & Resources -----------------------------------------------------
+  // Pokedex Content Manipulation ----------------------------------------------
 
-  Pokemon getCurrentPokemon() {
-    Pokemon pokemon = Pokemon.filler();
-    List<int> varieties = curr.varieties;
-
-    if (varieties.isNotEmpty) {
-      int id = varieties[0];
-      pokemon = _pokemons[id];
-    }
-
-    return pokemon;
+  void filter(String s) {
+    _dexIndex = 0;
+    _pokedex = _species.where((p) => p.name.startsWith(s)).toList();
+    notifyListeners();
   }
+
+  void scroll(int i) {
+    if (dexIndex.inRange(0, dexCount)) {
+      // Change current Pokedex Entry
+      _entry = _pokedex[i];
+      _dexIndex = i;
+
+      // Change current Entry's Form
+      _forms = entry.varieties.map((id) => getPokemon(id)).toList();
+      _form = forms[0];
+      _formIndex = 0;
+
+      notifyListeners();
+    }
+  }
+
+  void changeForm(int i) {
+    if (i != _formIndex && i.inRange(0, formCount)) {
+      _formIndex = i;
+      _form = forms[i];
+      notifyListeners();
+    }
+  }
+
+  void nextForm() => changeForm(_formIndex + 1);
+  void prevForm() => changeForm(_formIndex - 1);
+
+  // Specific Resource Getters -------------------------------------------------
 
   Species getSpecies(int i) {
     Species? species;
-    if (i.inRange(0, count)) species = _pokedex[i];
+    if (i.inRange(0, dexCount)) species = _pokedex[i];
     return species ?? Species.filler();
   }
 
@@ -134,20 +164,6 @@ class Dex with ChangeNotifier {
     Iterable slot = _pokemons.where((p) => p.id == i);
     if (slot.isNotEmpty) pokemon = slot.first;
     return pokemon ?? Pokemon.filler();
-  }
-
-  void filter(String s) {
-    _index = 0;
-    _pokedex = _species.where((p) => p.name.startsWith(s)).toList();
-    notifyListeners();
-  }
-
-  void scroll(int i) {
-    if (index.inRange(0, count)) {
-      _index = i;
-      _curr = _pokedex[i];
-      notifyListeners();
-    }
   }
 
   // Alter User-Toggled States -------------------------------------------------
