@@ -31,6 +31,7 @@ enum Typing {
 extension Shortcuts on Typing {
   //
 
+  String get text => name.toUpperCase();
   Color get color => _typingColor[this] ?? Colors.transparent;
 
   List<double> get strengths => _strengthChart[0];
