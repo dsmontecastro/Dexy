@@ -3,11 +3,9 @@ import 'package:pokedex/extensions/providers.dart';
 
 import 'package:pokedex/database/models/species.dart';
 import 'package:pokedex/database/models/pokemon.dart';
-import 'package:pokedex/types/enums/typing.dart';
-import 'package:pokedex/widgets/body/main_screen/title.dart';
+import 'package:pokedex/widgets/body/main_screen/title_bar.dart';
 
-import 'main_screen/background.dart';
-import 'main_screen/pkmn_sprite.dart';
+import 'main_screen/data_top.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,56 +15,52 @@ class MainScreen extends StatefulWidget {
 }
 
 class MainScreenState extends State<MainScreen> {
-  int variety = 0;
-
   @override
   Widget build(context) {
-    Species species = context.dex.curr;
-    List<int> varieties = species.varieties;
+    Species species = context.dex.entry;
+    Pokemon form = context.dex.form;
 
-    int id = 0;
-    if (varieties.isNotEmpty) id = varieties[variety];
+    return LayoutBuilder(builder: (context, constraints) {
+      final double width = constraints.maxWidth;
+      final double height = constraints.maxHeight;
 
-    Pokemon pokemon = context.db.getPokemon(id);
-    Typing type1 = pokemon.type1;
-    Typing type2 = pokemon.type2;
+      final double wOffset = width * 0.35;
+      final double hOffset = height * 0.15;
 
-    return Container(
-      decoration: const BoxDecoration(color: Colors.white),
-      constraints: const BoxConstraints.expand(),
-      alignment: Alignment.center,
-      child: Center(
-        child: Column(
-          children: [
-            //
+      final Widget data = Column(
+        children: [
+          Expanded(flex: 6, child: DataTop(form, wOffset)),
+          const Expanded(
+            flex: 3,
+            child: Text("BOT"),
+          ),
 
-            //
-            Expanded(
-              flex: 2,
-              child: TitleBar(species, type1, type2),
+          //
+        ],
+      );
+
+      return Stack(
+        children: [
+          //
+
+          Padding(
+            padding: EdgeInsets.only(top: hOffset * 0.9),
+            child: Container(
+              constraints: const BoxConstraints.expand(),
+              decoration: const BoxDecoration(color: Colors.red),
+              child: data,
             ),
+          ),
 
-            //
-            Expanded(
-              flex: 6,
-              child: Stack(
-                children: [
-                  Background(pokemon),
-                  PKMNSprite(id),
-                ],
-              ),
-            ),
+          SizedBox(height: hOffset, child: TitleBar(species, wOffset)),
 
-            //
-            Expanded(
-              flex: 3,
-              child: Text("BOT"),
-            ),
+          //
+        ],
+      );
 
-            //
-          ],
-        ),
-      ),
-    );
+      //
+    });
+
+    //
   }
 }
