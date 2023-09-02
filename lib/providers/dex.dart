@@ -119,9 +119,9 @@ class Dex with ChangeNotifier {
 
   // Pokedex Content Manipulation ----------------------------------------------
 
-  void filter(String s) {
+  void filter(String name) {
     _dexIndex = 0;
-    _pokedex = _species.where((p) => p.name.startsWith(s)).toList();
+    _pokedex = _species.where((s) => s.name.contains(name.toLowerCase())).toList();
     notifyListeners();
   }
 
