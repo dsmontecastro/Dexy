@@ -3,33 +3,23 @@ import 'package:pokedex/extensions/providers.dart';
 
 import 'package:pokedex/providers/dex.dart';
 
-import 'scroll_item.dart';
+import 'item.dart';
 
 const int menuCount = Dex.menuCount;
 const int rad = menuCount ~/ 2;
 
-class SideScroll extends StatefulWidget {
-  const SideScroll({super.key});
+class ScrollerBody extends StatefulWidget {
+  const ScrollerBody({super.key});
 
   @override
-  SideScrollState createState() => SideScrollState();
+  ScrollerBodyState createState() => ScrollerBodyState();
 }
 
-class SideScrollState extends State<SideScroll> {
-  final PageController controller = PageController(
-    initialPage: 0,
-    viewportFraction: 0.1,
-  );
-
-  late final int limit;
-
-  @override
-  void initState() {
-    limit = context.db.dexCount;
-    super.initState();
-  }
+class ScrollerBodyState extends State<ScrollerBody> {
+  //
 
   int index = 0;
+
   void scroll(int i) {
     setState(() {
       index = i;
@@ -37,8 +27,15 @@ class SideScrollState extends State<SideScroll> {
     });
   }
 
+  // PageView Controller -------------------------------------------------------
+
+  final PageController controller = PageController(
+    initialPage: 0,
+    viewportFraction: 0.1,
+  );
+
   void scrollTo(int i) {
-    if (i > 0 && i < limit) {
+    if (i > 0 && i < context.db.dexCount) {
       controller.animateToPage(
         i,
         curve: Curves.easeOutCubic,
@@ -59,9 +56,9 @@ class SideScrollState extends State<SideScroll> {
 
     return Container(
       width: double.infinity,
-      height: double.infinity,
+      // height: double.infinity,
       alignment: Alignment.centerLeft,
-      padding: EdgeInsets.symmetric(vertical: size.height / 15),
+      padding: EdgeInsets.symmetric(vertical: size.height / 15, horizontal: 25),
       decoration: const BoxDecoration(
         color: Colors.green,
       ),
@@ -87,7 +84,8 @@ class SideScrollState extends State<SideScroll> {
           itemCount: context.dex.dexCount,
           itemBuilder: (_, id) {
             return Padding(
-              padding: EdgeInsets.only(left: size.width / 8),
+              // padding: EdgeInsets.only(left: size.width / 8),
+              padding: EdgeInsets.zero,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,

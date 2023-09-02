@@ -19,7 +19,6 @@ class ScrollItem extends StatelessWidget {
     return Expanded(
       child: Container(
         width: size.width / 3,
-        // height: size.width / menuCount,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: flag ? Colors.black : Colors.red,
