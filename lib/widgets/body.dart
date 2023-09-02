@@ -6,8 +6,6 @@ import 'body/side_screens.dart';
 class Body extends StatelessWidget {
   const Body({super.key});
 
-  static const List<Widget> children = [MainScreen(), SideScreen()];
-
   @override
   Widget build(context) {
     return OrientationBuilder(
@@ -16,17 +14,24 @@ class Body extends StatelessWidget {
         final bool isVertical = orientation == Orientation.portrait;
         final Axis direction = isVertical ? Axis.vertical : Axis.horizontal;
 
+        final double barHeight = size.height * 0.15;
+
         return SizedBox(
           width: size.width,
           height: size.height,
           child: Flex(
             direction: direction,
             mainAxisSize: MainAxisSize.max,
-            children: List.generate(children.length, (int i) {
-              return Expanded(child: Center(child: children[i]));
-            }),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(child: MainScreen(barHeight)),
+              Expanded(child: Pages(barHeight * 0.8)),
+              // Expanded(child: SideScreen(barHeight * 0.8)),
+            ],
           ),
         );
+
+        //
       },
     );
   }

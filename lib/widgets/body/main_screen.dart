@@ -7,29 +7,21 @@ import 'package:pokedex/widgets/body/main_screen/title_bar.dart';
 
 import 'main_screen/data_top.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class MainScreen extends StatelessWidget {
+  const MainScreen(this.barHeight, {super.key});
+  final double barHeight;
 
-  @override
-  createState() => MainScreenState();
-}
-
-class MainScreenState extends State<MainScreen> {
   @override
   Widget build(context) {
     Species species = context.dex.entry;
     Pokemon form = context.dex.form;
 
     return LayoutBuilder(builder: (context, constraints) {
-      final double width = constraints.maxWidth;
-      final double height = constraints.maxHeight;
-
-      final double wOffset = width * 0.35;
-      final double hOffset = height * 0.15;
+      final double leftOffset = constraints.maxWidth * 0.35;
 
       final Widget data = Column(
         children: [
-          Expanded(flex: 6, child: DataTop(form, wOffset)),
+          Expanded(flex: 6, child: DataTop(form, leftOffset)),
           const Expanded(
             flex: 3,
             child: Text("BOT"),
@@ -44,7 +36,7 @@ class MainScreenState extends State<MainScreen> {
           //
 
           Padding(
-            padding: EdgeInsets.only(top: hOffset * 0.9),
+            padding: EdgeInsets.only(top: barHeight * 0.8),
             child: Container(
               constraints: const BoxConstraints.expand(),
               decoration: const BoxDecoration(color: Colors.red),
@@ -52,8 +44,8 @@ class MainScreenState extends State<MainScreen> {
             ),
           ),
 
-          SizedBox(height: hOffset, child: TitleBar(species, wOffset)),
-
+          SizedBox(height: barHeight, child: TitleBar(species, leftOffset)),
+//
           //
         ],
       );
