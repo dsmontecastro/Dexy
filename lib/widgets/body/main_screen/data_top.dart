@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pokedex/extensions/providers.dart';
 import 'package:pokedex/extensions/string.dart';
 
 import 'package:pokedex/types/enums/typing.dart';
@@ -8,14 +9,12 @@ import 'data_top/background.dart';
 import 'data_top/pkmn_sprite.dart';
 
 class DataTop extends StatelessWidget {
-  const DataTop(this.pokemon, this.wOffset, {super.key});
+  const DataTop(this.pokemon, this.left, {super.key});
   final Pokemon pokemon;
-  final double wOffset;
+  final double left;
 
   @override
   Widget build(context) {
-    final width = wOffset * 0.875;
-
     return Container(
       constraints: const BoxConstraints.expand(),
       decoration: const BoxDecoration(color: Colors.blue),
@@ -25,7 +24,7 @@ class DataTop extends StatelessWidget {
           //
 
           Container(
-            width: width,
+            width: left * 0.875,
             decoration: const BoxDecoration(color: Colors.green),
             // child:
           ),
@@ -44,41 +43,6 @@ class DataTop extends StatelessWidget {
         ],
       ),
     );
-
-    // return Container(
-    //   constraints: const BoxConstraints.expand(),
-    //   child: Row(
-    //     textDirection: TextDirection.ltr,
-    //     children: [
-    //       Stack(
-    //         children: [
-    //           Background(pokemon),
-    //           PKMNSprite(pokemon.id),
-    //         ],
-    //       ),
-    //     ],
-    //   ),
-    // );
-
-    // return LayoutBuilder(builder: (context, constraints) {
-    //   final width = constraints.maxWidth;
-    //   final height = constraints.maxHeight;
-
-    //   return Stack(
-    //     children: [
-    //       Container(height: height, color: Colors.grey.shade900),
-    //       Row(
-    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //         crossAxisAlignment: CrossAxisAlignment.center,
-    //         children: [
-    //           Flexible(flex: 1, child: TitleOrder(order)),
-    //           Flexible(flex: 2, child: TitleInfo(name, genus)),
-    //         ],
-    //       ),
-    //     ],
-    //   );
-
-    //
   }
 }
 

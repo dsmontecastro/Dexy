@@ -20,25 +20,33 @@ class TitleBar extends StatelessWidget {
 
     return LayoutBuilder(builder: (context, constraints) {
       final width = constraints.maxWidth;
-      final height = constraints.maxHeight * 0.9;
+      final height = constraints.maxHeight;
 
       return Stack(
         children: [
-          Container(height: height, color: Colors.grey.shade900),
+          //
+
+          Container(
+            height: height * 0.8,
+            decoration: BoxDecoration(color: Colors.grey.shade800),
+          ),
+
+          SizedBox(
+            height: height * 0.9,
+            child: OrderBanner(width, Colors.grey.shade900),
+          ),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(width: wOffset, child: TitleOrder(order)),
               SizedBox(width: width * 0.04),
-              Expanded(
-                child: SizedBox(
-                  height: height,
-                  child: TitleInfo(name, genus),
-                ),
-              ),
+              Expanded(child: TitleInfo(name, genus)),
             ],
           ),
+
+          //
         ],
       );
 

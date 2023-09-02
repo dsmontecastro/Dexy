@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pokedex/widgets/_misc/clippers.dart';
 
 class TitleOrder extends StatelessWidget {
   const TitleOrder(this.order, {super.key});
@@ -51,7 +52,7 @@ class OrderBanner extends StatelessWidget {
   @override
   Widget build(context) {
     return ClipPath(
-      clipper: SlantRight(),
+      clipper: SlantRight(0.9),
       child: Container(
         width: width,
         height: double.infinity,
@@ -60,22 +61,4 @@ class OrderBanner extends StatelessWidget {
       ),
     );
   }
-}
-
-class SlantRight extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final w = size.width;
-    final h = size.height;
-
-    path.lineTo(0, h);
-    path.lineTo(w * 0.9, h);
-    path.lineTo(w, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(oldClipper) => false;
 }
