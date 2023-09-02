@@ -1,145 +1,91 @@
-import 'dart:async';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:pokedex/widgets/body/side_screens/_test.dart';
 
-import 'side_screens/_pages.dart';
-// import 'side_screens/transition.dart';
+import 'side_screens/pages/scroller.dart';
 
-class SideScreen extends StatefulWidget {
-  const SideScreen({super.key});
+class Pages extends StatefulWidget {
+  const Pages(this.barHeight, {super.key});
+  final double barHeight;
 
   @override
-  SideScreenState createState() => SideScreenState();
+  createState() => PagesState();
 }
 
-class SideScreenState extends State<SideScreen> with TickerProviderStateMixin {
-  static const Icon _iconRight = Icon(Icons.arrow_right);
-  static const Icon _iconLeft = Icon(Icons.arrow_left);
+class PagesState extends State<Pages> {
+  //
 
-  // Transition Animation Elements ---------------------------------------------
+  int page = 0;
+  late final List<Widget> pages;
 
-  static const _duration = Duration(milliseconds: 150);
-  static const _reverseDuration = Duration(milliseconds: 100);
-
-  bool _animating = false;
-
-  late final AnimationController _animControl = AnimationController(
-    vsync: this,
-    duration: _duration,
-    reverseDuration: _reverseDuration,
-    animationBehavior: AnimationBehavior.preserve,
-  );
-
-  void transition() {
-    _animControl.forward();
-    Timer(_duration * 2.5, () {
-      _animControl.reverse();
-    });
+  @override
+  void initState() {
+    final double barHeight = widget.barHeight;
+    pages = [Scroller(barHeight), ...testPages];
+    super.initState();
   }
 
   // PageView Elements ---------------------------------------------------------
 
-  final PageController _pageControl = PageController(initialPage: 0);
-  final List<Widget> _pages = pageList;
-  int _page = 0;
+  late final PageController controller = PageController(initialPage: 0);
+  static const duration = Duration(milliseconds: 150);
+  static const physics = ScrollPhysics();
 
-  void nextPage() => swapPage(1);
-  void prevPage() => swapPage(-1);
+  void nextPage() => turnPage(1);
+  void prevPage() => turnPage(-1);
 
   void turnPage(int i) {
-    if (!_animating) {
-      setState(() {
-        _page = (_page + i) % _pages.length;
-        _pageControl.animateToPage(
-          _page,
-          curve: Curves.linear,
-          duration: _duration,
-        );
-        Timer(_duration * 2, () {
-          _animating = false;
-        });
-      });
-    }
+    setState(() {
+      page += i;
+      controller.animateToPage(
+        page,
+        curve: Curves.linear,
+        duration: duration,
+      );
+    });
   }
 
-  void swapPage(int i) {
-    if (!_animating) {
-      setState(() => _animating = true);
-      transition();
-      Timer(_duration * 2.75, () {
-        setState(() {
-          _page = (_page + i) % _pages.length;
-          _pageControl.jumpToPage(_page);
-          Timer(_duration * 2, () {
-            _animating = false;
-          });
-        });
-      });
-    }
-  }
+  // Button Icons --------------------------------------------------------------
+
+  static const Icon _iconRight = Icon(Icons.arrow_right);
+  static const Icon _iconLeft = Icon(Icons.arrow_left);
+
+  // Swipe Detection -----------------------------------------------------------
 
   @override
   Widget build(context) {
-    // Build Proper
+    //
 
-    Widget stack = Stack(
-      fit: StackFit.expand,
-      children: [
-        PageView(
-          dragStartBehavior: DragStartBehavior.start,
-          physics: const ScrollPhysics(),
-          controller: _pageControl,
-          children: _pages,
-        ),
-        Center(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.1),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                PageButton(_iconLeft, prevPage),
-                PageButton(_iconRight, nextPage),
-              ],
-            ),
-          ),
-        ),
-        // IgnorePointer(
-        //   child: LayoutBuilder(
-        //     builder: (context, constraints) => Transition(
-        //       constraints,
-        //       _animControl,
-        //     ),
-        //   ),
-        // ),
-      ],
+    final scrollBehavior = ScrollConfiguration.of(context).copyWith(
+      dragDevices: {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      },
     );
 
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      alignment: Alignment.centerLeft,
-      decoration: const BoxDecoration(
-        color: Colors.green,
-      ),
-      child: GestureDetector(
-        onHorizontalDragEnd: (details) {
-          const int sens = 500;
-          final double? velocity = details.primaryVelocity;
-          debugPrint(velocity.toString());
-          if (velocity != null) {
-            if (velocity < -sens) {
-              turnPage(1);
-            } else if (velocity > sens) {
-              turnPage(-1);
-            }
-          }
-        },
-        child: stack,
+    final pageView = PageView.builder(
+      dragStartBehavior: DragStartBehavior.start,
+      scrollBehavior: scrollBehavior,
+      controller: controller,
+      physics: physics,
+      itemBuilder: (_, i) => pages[i % pages.length],
+    );
+
+    final buttons = Container(
+      constraints: const BoxConstraints.expand(),
+      child: Padding(
+        padding: EdgeInsets.only(top: widget.barHeight),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            PageButton(_iconLeft, prevPage),
+            PageButton(_iconRight, nextPage),
+          ],
+        ),
       ),
     );
+
+    return Stack(children: [pageView, buttons]);
   }
 }
 
@@ -148,12 +94,20 @@ class PageButton extends StatelessWidget {
   final Function() func;
   final Icon icon;
 
+  static final shade = BoxDecoration(
+    color: Colors.black.withOpacity(0.3),
+  );
+
   @override
   Widget build(context) {
-    return IconButton(
-      icon: icon,
-      color: Colors.grey,
-      onPressed: func,
+    return Container(
+      decoration: shade,
+      height: double.infinity,
+      child: IconButton(
+        icon: icon,
+        color: Colors.grey,
+        onPressed: func,
+      ),
     );
   }
 }
