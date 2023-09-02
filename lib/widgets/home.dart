@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/providers.dart';
 
-import 'body.dart';
+import '_body.dart';
 import '_drawer.dart';
 
 class Home extends StatelessWidget {

@@ -10,23 +10,25 @@ class Body extends StatelessWidget {
   Widget build(context) {
     return OrientationBuilder(
       builder: (context, orientation) {
-        final Size size = MediaQuery.of(context).size;
         final bool isVertical = orientation == Orientation.portrait;
         final Axis direction = isVertical ? Axis.vertical : Axis.horizontal;
 
-        final double barHeight = size.height * 0.15;
+        final Size size = MediaQuery.of(context).size;
+
+        final double width = size.width;
+        final double height = size.height;
+        final double barHeight = height * 0.15;
 
         return SizedBox(
-          width: size.width,
-          height: size.height,
+          width: width,
+          height: height,
           child: Flex(
             direction: direction,
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(child: MainScreen(barHeight)),
-              Expanded(child: Pages(barHeight * 0.8)),
-              // Expanded(child: SideScreen(barHeight * 0.8)),
+              Expanded(child: SideScreens(barHeight * 0.8)),
             ],
           ),
         );

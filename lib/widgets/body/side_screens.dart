@@ -4,15 +4,15 @@ import 'package:pokedex/widgets/body/side_screens/_test.dart';
 
 import 'side_screens/pages/scroller.dart';
 
-class Pages extends StatefulWidget {
-  const Pages(this.barHeight, {super.key});
+class SideScreens extends StatefulWidget {
+  const SideScreens(this.barHeight, {super.key});
   final double barHeight;
 
   @override
-  createState() => PagesState();
+  createState() => SideScreensState();
 }
 
-class PagesState extends State<Pages> {
+class SideScreensState extends State<SideScreens> {
   //
 
   int page = 0;
