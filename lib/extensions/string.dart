@@ -26,8 +26,65 @@ extension MoreStrings on String {
   }
 
   String capitalize({Pattern pattern = separator}) {
+    //
+
+    int index = 0;
+    int limit = length - 1;
     List<String> list = split("");
-    list[0] = list[0].toUpperCase();
-    return list.join();
+
+    // Special Case: Nidoran-♂/♀
+    if (startsWith("nidoran-")) {
+      list[limit - 1] = " ";
+
+      if (list[limit] == "m") {
+        list[limit] = "♂";
+      } else {
+        list[limit] = "♀";
+      }
+    }
+
+    // Special Case: The Mimes
+    else if (startsWith("mr") || endsWith("jr")) {
+      list[index] = list[index].toUpperCase();
+
+      index = indexOf("-") + 1;
+      list[index] = list[index].toUpperCase();
+
+      index = indexOf("r");
+      list[index] = ". ";
+    }
+
+    // Special Case: Ho-oh + Kommo-o Line
+    else if (contains("-o")) {
+      list[index] = list[index].toUpperCase();
+    }
+
+    // Majority of other Pokemon
+    else {
+      while (index >= 0) {
+        list[index] = list[index].toUpperCase();
+
+        index = list.indexOf("-", index);
+        if (this == "type-null") {
+          list[index] = ": ";
+        } else if (!dashed.contains(this)) {
+          list[index] = " ";
+        }
+
+        index += 1;
+      }
+    }
+
+    return list.join().trim();
   }
+
+  static const dashed = [
+    "porygon-z",
+    "wo-chien",
+    "chien-pao",
+    "ting-lu",
+    "chi-yu",
+  ];
+
+  //
 }

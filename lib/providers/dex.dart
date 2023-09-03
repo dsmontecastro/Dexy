@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/num.dart';
+import 'package:pokedex/extensions/string.dart';
 
 import '../database/db.dart';
 import '../database/api.dart';
@@ -120,12 +121,23 @@ class Dex with ChangeNotifier {
   // Pokedex Content Manipulation ----------------------------------------------
 
   void filter(String name) {
+    // Filters Pokedex for entered Name
+
+    name = name.toLowerCase();
+
+    _pokedex = _species.where((s) {
+      String name1 = s.name;
+      String name2 = name1.capitalize();
+      return name1.contains(name) || name2.contains(name);
+    }).toList();
+
     _dexIndex = 0;
-    _pokedex = _species.where((s) => s.name.contains(name.toLowerCase())).toList();
     notifyListeners();
   }
 
   void scroll(int i) {
+    // "Scrolls" the Pokedex to input
+
     if (dexIndex.inRange(0, dexCount)) {
       // Change current Pokedex Entry
       _entry = _pokedex[i];
