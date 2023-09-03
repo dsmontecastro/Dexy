@@ -5,13 +5,17 @@ class TitleInfo extends StatelessWidget {
   final String genus;
   final String name;
 
+  static const padding = EdgeInsets.only(bottom: 25);
+  static const alignment = Alignment.centerLeft;
+  static const constraints = BoxConstraints.expand();
+
   @override
   Widget build(context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: padding,
       child: Container(
-        alignment: Alignment.centerLeft,
-        constraints: const BoxConstraints.expand(),
+        alignment: alignment,
+        constraints: constraints,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -31,8 +35,16 @@ class InfoText extends StatelessWidget {
 
   @override
   Widget build(context) {
+    // return Text(
+    //   text,
+    //   maxLines: 1,
+    //   style: const TextStyle(
+    //     fontSize: 25,
+    //     color: Colors.white,
+    //   ),
+    // );
     return FittedBox(
-      fit: BoxFit.fitHeight,
+      fit: BoxFit.scaleDown,
       child: Text(
         text,
         maxLines: 1,

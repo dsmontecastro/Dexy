@@ -41,6 +41,7 @@ class MainAppBar extends StatelessWidget {
               SizedBox(width: wOffset, child: TitleOrder(order)),
               SizedBox(width: width * 0.04),
               Expanded(child: TitleInfo(name, genus)),
+              SizedBox(width: width * 0.1),
             ],
           ),
 
