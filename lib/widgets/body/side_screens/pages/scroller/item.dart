@@ -16,18 +16,16 @@ class ScrollItem extends StatelessWidget {
 
     final Species pkmn = dex.getSpecies(id);
 
-    return Expanded(
-      child: Container(
-        width: size.width / 3,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: flag ? Colors.black : Colors.red,
-        ),
-        child: Text(
-          "${pkmn.id}-${pkmn.name}",
-          textAlign: TextAlign.right,
-          style: TextStyle(color: flag ? Colors.white : Colors.black),
-        ),
+    return Container(
+      width: size.width / 3,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: flag ? Colors.black : Colors.red,
+      ),
+      child: Text(
+        "${pkmn.id}-${pkmn.name}",
+        textAlign: TextAlign.right,
+        style: TextStyle(color: flag ? Colors.white : Colors.black),
       ),
     );
   }

@@ -49,19 +49,17 @@ class ScrollerBodyState extends State<ScrollerBody> {
     // Build Proper
 
     final Size size = MediaQuery.of(context).size;
-    final Widget divider = SizedBox(
-      width: size.width / 15,
-      height: size.height / menuCount / 5,
-    );
+
+    final double padV = size.height / 15;
+    final double padH = 50;
+    final padding = EdgeInsets.fromLTRB(padH + 20, padV, padH, padV);
 
     return Container(
       width: double.infinity,
       // height: double.infinity,
       alignment: Alignment.centerLeft,
-      padding: EdgeInsets.symmetric(vertical: size.height / 15, horizontal: 25),
-      decoration: const BoxDecoration(
-        color: Colors.green,
-      ),
+      color: Colors.green,
+      padding: padding,
 
       // Scrollbar Container
       child: Scrollbar(
@@ -84,14 +82,17 @@ class ScrollerBodyState extends State<ScrollerBody> {
           itemCount: context.dex.dexCount,
           itemBuilder: (_, id) {
             return Padding(
-              // padding: EdgeInsets.only(left: size.width / 8),
-              padding: EdgeInsets.zero,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [divider, ScrollItem(id, size)],
-              ),
+              padding: const EdgeInsets.only(bottom: 15),
+              child: ScrollItem(id, size),
             );
+            // padding: EdgeInsets.only(left: size.width / 8),
+            // padding: EdgeInsets.zero,
+            //   child: Column(
+            //     mainAxisSize: MainAxisSize.min,
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: [divider, ScrollItem(id, size)],
+            //   ),
+            // );
           },
         ),
       ),

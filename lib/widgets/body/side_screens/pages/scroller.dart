@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:pokedex/providers/dex.dart';
-
 import 'scroller/body.dart';
 import 'scroller/search.dart';
 

@@ -9,23 +9,29 @@ const List<Color> colors = [
   Colors.purple,
 ];
 
-final List<Widget> testPages = List.generate(5, (index) => Test(index + 1));
-
 class Test extends StatelessWidget {
-  const Test(this.id, {super.key});
+  const Test(this.id, this.height, {super.key});
+  final double height;
   final int id;
+
+  static const constraints = BoxConstraints.expand();
 
   @override
   Widget build(context) {
-    return Center(
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          color: colors[id],
+    final text = "SideItem#${id % colors.length}";
+    final color = colors[id % colors.length];
+
+    return Column(
+      children: [
+        Container(height: height, color: Colors.grey.shade800),
+        Expanded(
+          child: Container(
+            color: color,
+            constraints: constraints,
+            child: Center(child: Text(text)),
+          ),
         ),
-        child: Center(child: Text("SideItem#$id")),
-      ),
+      ],
     );
   }
 }

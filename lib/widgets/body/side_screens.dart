@@ -1,8 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:pokedex/widgets/body/side_screens/_test.dart';
 
-import 'side_screens/pages/scroller.dart';
+import 'side_screens/_pages.dart';
 
 class SideScreens extends StatefulWidget {
   const SideScreens(this.barHeight, {super.key});
@@ -15,21 +14,24 @@ class SideScreens extends StatefulWidget {
 class SideScreensState extends State<SideScreens> {
   //
 
-  int page = 0;
-  late final List<Widget> pages;
+  // Constants -----------------------------------------------------------------
 
-  @override
-  void initState() {
-    final double barHeight = widget.barHeight;
-    pages = [Scroller(barHeight), ...testPages];
-    super.initState();
-  }
+  static const Icon _iconRight = Icon(Icons.arrow_right);
+  static const Icon _iconLeft = Icon(Icons.arrow_left);
 
-  // PageView Elements ---------------------------------------------------------
-
-  late final PageController controller = PageController(initialPage: 0);
   static const duration = Duration(milliseconds: 150);
   static const physics = ScrollPhysics();
+
+  // Page & PageView Control ---------------------------------------------------
+
+  static final initialPage = pageCount * 999;
+
+  int page = initialPage;
+  final controller = PageController(initialPage: initialPage);
+
+  void onPageChanged(int i) {
+    setState(() => page = i);
+  }
 
   void nextPage() => turnPage(1);
   void prevPage() => turnPage(-1);
@@ -45,30 +47,21 @@ class SideScreensState extends State<SideScreens> {
     });
   }
 
-  // Button Icons --------------------------------------------------------------
-
-  static const Icon _iconRight = Icon(Icons.arrow_right);
-  static const Icon _iconLeft = Icon(Icons.arrow_left);
-
-  // Swipe Detection -----------------------------------------------------------
-
   @override
   Widget build(context) {
     //
 
     final scrollBehavior = ScrollConfiguration.of(context).copyWith(
-      dragDevices: {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      },
+      dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
     );
 
     final pageView = PageView.builder(
       dragStartBehavior: DragStartBehavior.start,
       scrollBehavior: scrollBehavior,
+      onPageChanged: onPageChanged,
       controller: controller,
       physics: physics,
-      itemBuilder: (_, i) => pages[i % pages.length],
+      itemBuilder: (_, i) => pageList[i % pageCount](widget.barHeight),
     );
 
     final buttons = Container(

@@ -5,19 +5,19 @@ class SearchField extends StatelessWidget {
   const SearchField(this.height, {super.key});
   final double height;
 
-  static const searchIcon = Icon(Icons.search, color: Colors.black);
-  static const searchPad = EdgeInsets.symmetric(horizontal: 20, vertical: 10);
-  static final searchDecor = BoxDecoration(color: Colors.grey.shade800);
+  static final Color color = Colors.grey.shade800;
+  static const Icon icon = Icon(Icons.search, color: Colors.black);
+  static const padding = EdgeInsets.symmetric(horizontal: 20, vertical: 10);
 
   @override
   Widget build(context) {
     return Container(
-      decoration: searchDecor,
+      color: color,
       height: height,
       child: Padding(
-        padding: searchPad,
+        padding: padding,
         child: SearchBar(
-          leading: searchIcon,
+          leading: icon,
           hintText: "Search...",
           onChanged: context.db.filter,
         ),
