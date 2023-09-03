@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/string.dart';
-
-import 'package:pokedex/types/enums/typing.dart';
 import 'package:pokedex/database/models/species.dart';
 
-import 'title_bar/info.dart';
-import 'title_bar/order.dart';
+import 'app_bar/info.dart';
+import 'app_bar/order.dart';
 
-class TitleBar extends StatelessWidget {
-  const TitleBar(this.species, this.wOffset, {super.key});
+class MainAppBar extends StatelessWidget {
+  const MainAppBar(this.species, this.wOffset, {super.key});
   final Species species;
   final double wOffset;
 
@@ -52,18 +50,5 @@ class TitleBar extends StatelessWidget {
 
       //
     });
-  }
-}
-
-class TypingBox extends StatelessWidget {
-  const TypingBox(this.typing, {super.key});
-  final Typing typing;
-
-  @override
-  Widget build(context) {
-    String name = typing.name;
-    Color color = typing.color;
-
-    return Container();
   }
 }

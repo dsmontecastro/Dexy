@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// import 'package:pokedex/types/enums/typing.dart';
 
 import 'package:pokedex/widgets/_misc/sprites.dart';
 
@@ -22,16 +23,6 @@ class PKMNSpriteState extends State<PKMNSprite> {
     Image shiny = SpriteHandler.getShiny(id);
     Image sprite = SpriteHandler.getSprite(id);
 
-    final image = Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(id.toString()),
-        IconButton(icon: icon, onPressed: toggleShiny),
-        Expanded(child: isShiny ? shiny : sprite),
-      ],
-    );
-
     return Container(
       constraints: const BoxConstraints.expand(),
       child: Column(
@@ -43,5 +34,20 @@ class PKMNSpriteState extends State<PKMNSprite> {
         ],
       ),
     );
+
+    //
   }
 }
+
+// class TypingBox extends StatelessWidget {
+//   const TypingBox(this.typing, {super.key});
+//   final Typing typing;
+
+//   @override
+//   Widget build(context) {
+//     String name = typing.name;
+//     Color color = typing.color;
+
+//     return Container();
+//   }
+// }

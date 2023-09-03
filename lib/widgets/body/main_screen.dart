@@ -3,7 +3,7 @@ import 'package:pokedex/extensions/providers.dart';
 
 import 'package:pokedex/database/models/species.dart';
 import 'package:pokedex/database/models/pokemon.dart';
-import 'package:pokedex/widgets/body/main_screen/title_bar.dart';
+import 'package:pokedex/widgets/body/main_screen/app_bar.dart';
 
 import 'main_screen/data_top.dart';
 
@@ -44,7 +44,7 @@ class MainScreen extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: barHeight, child: TitleBar(species, leftOffset)),
+          SizedBox(height: barHeight, child: MainAppBar(species, leftOffset)),
 //
           //
         ],
