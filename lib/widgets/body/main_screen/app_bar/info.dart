@@ -5,51 +5,50 @@ class TitleInfo extends StatelessWidget {
   final String genus;
   final String name;
 
-  static const padding = EdgeInsets.only(bottom: 25);
   static const alignment = Alignment.centerLeft;
   static const constraints = BoxConstraints.expand();
 
   @override
   Widget build(context) {
-    return Padding(
-      padding: padding,
-      child: Container(
-        alignment: alignment,
-        constraints: constraints,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(flex: 2, child: InfoText(name, 75)),
-            Expanded(flex: 1, child: InfoText(genus, 25)),
-          ],
+    return LayoutBuilder(builder: (context, constraints) {
+      final double height = constraints.maxHeight;
+
+      final padding = EdgeInsets.only(bottom: height * 0.2);
+
+      return Padding(
+        padding: padding,
+        child: Container(
+          alignment: alignment,
+          constraints: constraints,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(flex: 3, child: InfoText(name, 30)),
+              Expanded(flex: 1, child: InfoText(genus, 25)),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+
+      //
+    });
   }
 }
 
 class InfoText extends StatelessWidget {
   const InfoText(this.text, this.size, {super.key});
   final String text;
-  final int size;
+  final double size;
 
   @override
   Widget build(context) {
-    // return Text(
-    //   text,
-    //   maxLines: 1,
-    //   style: const TextStyle(
-    //     fontSize: 25,
-    //     color: Colors.white,
-    //   ),
-    // );
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Text(
         text,
         maxLines: 1,
-        style: const TextStyle(
-          fontSize: 25,
+        style: TextStyle(
+          fontSize: size,
           color: Colors.white,
         ),
       ),
