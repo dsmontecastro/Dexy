@@ -7,10 +7,10 @@ class SearchField extends StatelessWidget {
 
   static final Color color = Colors.grey.shade800;
   static const Icon icon = Icon(Icons.search, color: Colors.black);
-  static const padding = EdgeInsets.symmetric(horizontal: 20, vertical: 10);
 
   @override
   Widget build(context) {
+    final padding = EdgeInsets.symmetric(horizontal: 25, vertical: height * 0.2);
     return Container(
       color: color,
       height: height,
