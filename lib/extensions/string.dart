@@ -5,7 +5,7 @@ const String separator = ",";
 extension MoreStrings on String {
   // Custom String Extensions
 
-  String nill() => blank;
+  static String nill() => blank;
 
   bool toBool() => this == "1" || toLowerCase() == "true";
 
@@ -25,15 +25,44 @@ extension MoreStrings on String {
     return list.map(int.parse).toList();
   }
 
-  String capitalize({Pattern pattern = separator}) {
+  String capitalize() {
+    List<String> list = split("");
+    list[0] = list[0].toUpperCase();
+    return list.join("");
+  }
+
+  // PokeAPI Specific ----------------------------------------------------------
+
+  String form(String species) {
+    replaceFirst("$species-", "");
+    List<String> list = split("-");
+
+    if (list[0].contains("0")) {
+      list[0] += "%";
+    }
+
+    list = list.map((s) => s.capitalize()).toList();
+
+    return list.join(" ").trim();
+  }
+
+  String species() {
     //
 
-    int index = 0;
     int limit = length - 1;
     List<String> list = split("");
 
+    // Capitalize 1st Letter
+    int index = 0;
+    list[index] = list[index].toUpperCase();
+
+    // Special Case: Ho-oh + Kommo-o Line
+    if (contains("-o")) {
+      return this;
+    }
+
     // Special Case: Nidoran-♂/♀
-    if (startsWith("nidoran-")) {
+    else if (startsWith("nidoran-")) {
       list[limit - 1] = " ";
 
       if (list[limit] == "m") {
@@ -45,8 +74,6 @@ extension MoreStrings on String {
 
     // Special Case: The Mimes
     else if (startsWith("mr") || endsWith("jr")) {
-      list[index] = list[index].toUpperCase();
-
       index = indexOf("-") + 1;
       list[index] = list[index].toUpperCase();
 
@@ -54,17 +81,14 @@ extension MoreStrings on String {
       list[index] = ". ";
     }
 
-    // Special Case: Ho-oh + Kommo-o Line
-    else if (contains("-o")) {
-      list[index] = list[index].toUpperCase();
-    }
-
-    // Majority of other Pokemon
+    // General: Capitalize First & After-Dash
     else {
-      while (index >= 0) {
-        list[index] = list[index].toUpperCase();
+      list[index] = list[index].toUpperCase();
 
-        index = list.indexOf("-", index);
+      // Modify "-" if Exists & Necessary
+      index = list.indexOf("-", index);
+
+      if (index > 0) {
         if (this == "type-null") {
           list[index] = ": ";
         } else if (!dashed.contains(this)) {
@@ -72,6 +96,7 @@ extension MoreStrings on String {
         }
 
         index += 1;
+        list[index] = list[index].toUpperCase();
       }
     }
 

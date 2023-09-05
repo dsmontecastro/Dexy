@@ -64,10 +64,10 @@ class Species implements Model {
       required this.varieties});
 
   Species.filler()
-      : name = "_",
-        text = "_",
-        genus = "_",
-        growthRate = "_",
+      : name = blank,
+        text = blank,
+        genus = blank,
+        growthRate = blank,
         caught = false,
         favorite = false,
         isBaby = false,
