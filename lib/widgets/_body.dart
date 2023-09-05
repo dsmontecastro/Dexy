@@ -10,14 +10,14 @@ class Body extends StatelessWidget {
   Widget build(context) {
     return OrientationBuilder(
       builder: (context, orientation) {
-        final bool isVertical = orientation == Orientation.portrait;
-        final Axis direction = isVertical ? Axis.vertical : Axis.horizontal;
+        final bool isPortrait = orientation == Orientation.portrait;
+        final Axis direction = isPortrait ? Axis.vertical : Axis.horizontal;
 
         final Size size = MediaQuery.of(context).size;
 
         final double width = size.width;
         final double height = size.height;
-        final double barHeight = height * 0.15;
+        final double barHeight = isPortrait ? height * 0.075 : height * 0.15;
 
         return SizedBox(
           width: width,
