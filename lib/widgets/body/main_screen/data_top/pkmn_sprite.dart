@@ -1,53 +1,42 @@
 import 'package:flutter/material.dart';
-// import 'package:pokedex/types/enums/typing.dart';
 
-import 'package:pokedex/widgets/_misc/sprites.dart';
+import 'package:pokedex/database/models/pokemon.dart';
 
-class PKMNSprite extends StatefulWidget {
-  const PKMNSprite(this.id, {super.key});
-  final int id;
+class PKMNSprite extends StatelessWidget {
+  const PKMNSprite(this.pokemon, this.isShiny, {super.key});
+  final Pokemon pokemon;
+  final bool isShiny;
 
-  @override
-  createState() => PKMNSpriteState();
-}
+  static const String path = "assets/pokemon";
 
-class PKMNSpriteState extends State<PKMNSprite> {
-  static const Icon icon = Icon(Icons.abc);
-
-  bool isShiny = false;
-  void toggleShiny() => setState(() => isShiny = !isShiny);
+  String getType(bool flag) {
+    if (flag) {
+      return "shinies";
+    } else {
+      return "sprites";
+    }
+  }
 
   @override
   Widget build(context) {
-    int id = widget.id;
-    Image shiny = SpriteHandler.getShiny(id);
-    Image sprite = SpriteHandler.getSprite(id);
+    final int id = pokemon.id;
+    final String loc = "$path/${getType(isShiny)}";
 
-    return Container(
-      constraints: const BoxConstraints.expand(),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(id.toString()),
-          IconButton(icon: icon, onPressed: toggleShiny),
-          Expanded(child: isShiny ? shiny : sprite),
-        ],
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Image.asset(
+        "$loc/$id.png",
+        fit: BoxFit.fitWidth,
+        gaplessPlayback: true,
+        filterQuality: FilterQuality.high,
+        errorBuilder: (context, error, stackTrace) {
+          if (isShiny) {
+            return Image.asset("${getType(!isShiny)}/$id.png");
+          } else {
+            return Image.asset("$loc/0.png");
+          }
+        },
       ),
     );
-
-    //
   }
 }
-
-// class TypingBox extends StatelessWidget {
-//   const TypingBox(this.typing, {super.key});
-//   final Typing typing;
-
-//   @override
-//   Widget build(context) {
-//     String name = typing.name;
-//     Color color = typing.color;
-
-//     return Container();
-//   }
-// }

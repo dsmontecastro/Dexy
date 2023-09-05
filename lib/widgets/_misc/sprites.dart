@@ -15,7 +15,8 @@ class SpriteHandler {
   static Image getAsset(String type, int id) {
     return Image.asset(
       "$type/$id.png",
-      fit: BoxFit.scaleDown,
+      fit: BoxFit.fitHeight,
+      gaplessPlayback: true,
       filterQuality: FilterQuality.high,
       errorBuilder: (context, error, stackTrace) {
         return Image.asset("$type/0.png");
