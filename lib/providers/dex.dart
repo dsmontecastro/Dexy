@@ -30,8 +30,8 @@ class Dex with ChangeNotifier {
   int get dexIndex => _dexIndex;
   int get dexCount => _pokedex.length;
 
-  List<Pokemon> _forms = [Pokemon.filler()];
-  List<Pokemon> get forms => _forms;
+  List<Pokemon> _forms = [];
+  List<Pokemon> get forms => _forms.isEmpty ? [Pokemon.filler()] : _forms;
 
   Pokemon? _form;
   Pokemon get form => _form ?? Pokemon.filler();
@@ -131,25 +131,28 @@ class Dex with ChangeNotifier {
       return name1.contains(name) || name2.contains(name);
     }).toList();
 
-    _dexIndex = 0;
-    notifyListeners();
+    scroll(0);
   }
 
   void scroll(int i) {
     // "Scrolls" the Pokedex to input
 
-    if (dexIndex.inRange(0, dexCount)) {
-      // Change current Pokedex Entry
+    // Change current Pokedex Entry
+    if (i.inRange(0, dexCount)) {
       _entry = _pokedex[i];
       _dexIndex = i;
-
-      // Change current Entry's Form
-      _forms = entry.varieties.map((id) => getPokemon(id)).toList();
-      _form = forms[0];
-      _formIndex = 0;
-
-      notifyListeners();
+    } else {
+      _entry = Species.filler();
+      _dexIndex = -1;
     }
+
+    // Change current Entry's Form
+    _forms = entry.varieties.map((id) => getPokemon(id)).toList();
+    _form = forms[0];
+    _formIndex = 0;
+    notifyListeners();
+
+    //
   }
 
   void changeForm(int i) {
