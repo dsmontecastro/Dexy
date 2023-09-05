@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import 'package:pokedex/widgets/_misc/page_buttons.dart';
+
 import 'side_screens/_pages.dart';
 
 class SideScreens extends StatefulWidget {
@@ -16,13 +18,12 @@ class SideScreensState extends State<SideScreens> {
 
   // Constants -----------------------------------------------------------------
 
-  static const Icon _iconRight = Icon(Icons.arrow_right);
-  static const Icon _iconLeft = Icon(Icons.arrow_left);
-
   static const duration = Duration(milliseconds: 150);
+  static const curve = Curves.linear;
+
   static const physics = ScrollPhysics();
 
-  // Page & PageView Control ---------------------------------------------------
+  // PageView Elements & Controllers -------------------------------------------
 
   static final initialPage = pageCount * 999;
 
@@ -41,7 +42,7 @@ class SideScreensState extends State<SideScreens> {
       page += i;
       controller.animateToPage(
         page,
-        curve: Curves.linear,
+        curve: curve,
         duration: duration,
       );
     });
@@ -49,58 +50,31 @@ class SideScreensState extends State<SideScreens> {
 
   @override
   Widget build(context) {
-    //
+    return Stack(
+      children: [
+        //
 
-    final scrollBehavior = ScrollConfiguration.of(context).copyWith(
-      dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
-    );
-
-    final pageView = PageView.builder(
-      dragStartBehavior: DragStartBehavior.start,
-      scrollBehavior: scrollBehavior,
-      onPageChanged: onPageChanged,
-      controller: controller,
-      physics: physics,
-      itemBuilder: (_, i) => pageList[i % pageCount](widget.barHeight),
-    );
-
-    final buttons = Container(
-      constraints: const BoxConstraints.expand(),
-      child: Padding(
-        padding: EdgeInsets.only(top: widget.barHeight),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            PageButton(_iconLeft, prevPage),
-            PageButton(_iconRight, nextPage),
-          ],
+        //
+        PageView.builder(
+          dragStartBehavior: DragStartBehavior.start,
+          onPageChanged: onPageChanged,
+          controller: controller,
+          physics: physics,
+          itemBuilder: (_, i) {
+            final int index = i % pageCount;
+            return pageList[index](widget.barHeight);
+          },
         ),
-      ),
-    );
 
-    return Stack(children: [pageView, buttons]);
-  }
-}
+        //
+        PageButtons(
+          padding: EdgeInsets.only(top: widget.barHeight),
+          prev: prevPage,
+          next: nextPage,
+        ),
 
-class PageButton extends StatelessWidget {
-  const PageButton(this.icon, this.func, {super.key});
-  final Function() func;
-  final Icon icon;
-
-  static final shade = BoxDecoration(
-    color: Colors.black.withOpacity(0.3),
-  );
-
-  @override
-  Widget build(context) {
-    return Container(
-      decoration: shade,
-      height: double.infinity,
-      child: IconButton(
-        icon: icon,
-        color: Colors.grey,
-        onPressed: func,
-      ),
+        //
+      ],
     );
   }
 }
