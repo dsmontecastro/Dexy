@@ -1,60 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:pokedex/extensions/providers.dart';
-import 'package:pokedex/extensions/string.dart';
 
-import 'package:pokedex/types/enums/typing.dart';
-import 'package:pokedex/database/models/pokemon.dart';
+import 'package:pokedex/database/models/species.dart';
 
-import 'data_top/background.dart';
-import 'data_top/pkmn_sprite.dart';
+import 'data_top/forms.dart';
 
 class DataTop extends StatelessWidget {
-  const DataTop(this.pokemon, this.left, {super.key});
-  final Pokemon pokemon;
+  const DataTop(this.species, this.left, {super.key});
+  final Species species;
   final double left;
 
+  static const bgColor = Color.fromARGB(255, 177, 177, 177);
+  static final bg = Positioned.fill(
+    child: Image.asset(
+      'assets/images/hex.png',
+      repeat: ImageRepeat.repeat,
+      color: bgColor,
+    ),
+  );
+
   @override
   Widget build(context) {
-    return Container(
-      constraints: const BoxConstraints.expand(),
-      decoration: const BoxDecoration(color: Colors.blue),
-      child: Row(
-        textDirection: TextDirection.ltr,
-        children: [
-          //
-
-          Container(
-            width: left * 0.875,
-            decoration: const BoxDecoration(color: Colors.green),
-            // child:
-          ),
-
-          //
-          Expanded(
-            child: Stack(
-              children: [
-                Background(pokemon),
-                PKMNSprite(pokemon.id),
-              ],
-            ),
-          ),
-
-          //
-        ],
-      ),
+    return Stack(
+      children: [
+        bg,
+        Row(
+          children: [
+            // Data(),
+            Expanded(flex: 55, child: Container(color: Colors.white.withOpacity(0.5))),
+            Expanded(flex: 45, child: Forms(species)),
+            // Forms(),
+          ],
+        )
+      ],
     );
-  }
-}
-
-class TypingBox extends StatelessWidget {
-  const TypingBox(this.typing, {super.key});
-  final Typing typing;
-
-  @override
-  Widget build(context) {
-    String name = typing.name;
-    Color color = typing.color;
-
-    return Container();
   }
 }

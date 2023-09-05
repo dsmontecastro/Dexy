@@ -6,14 +6,14 @@ import 'app_bar/info.dart';
 import 'app_bar/order.dart';
 
 class MainAppBar extends StatelessWidget {
-  const MainAppBar(this.species, this.wOffset, {super.key});
+  const MainAppBar(this.species, this.left, {super.key});
   final Species species;
-  final double wOffset;
+  final double left;
 
   @override
   Widget build(context) {
-    final name = species.name.capitalize();
-    final order = species.order.toString();
+    final name = species.name.species();
+    final order = species.order;
     final genus = species.genus;
 
     return LayoutBuilder(builder: (context, constraints) {
@@ -38,10 +38,10 @@ class MainAppBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(width: wOffset, child: TitleOrder(order)),
+              SizedBox(width: width * left, child: TitleOrder(order)),
               SizedBox(width: width * 0.04),
               Expanded(child: TitleInfo(name, genus)),
-              SizedBox(width: width * 0.1),
+              SizedBox(width: width * 0.15),
             ],
           ),
 
