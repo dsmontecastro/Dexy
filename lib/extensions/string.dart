@@ -34,16 +34,28 @@ extension MoreStrings on String {
   // PokeAPI Specific ----------------------------------------------------------
 
   String form(String species) {
-    replaceFirst("$species-", "");
-    List<String> list = split("-");
+    //
 
-    if (list[0].contains("0")) {
+    // Remove Species from Form Name
+    String temp = replaceFirst(species, "");
+    if (temp.isEmpty) return "Base";
+
+    // Split at "-" & Capitalize each word
+    List<String> list = temp.substring(1).split("-");
+    list = list.map((s) => s.capitalize()).toList();
+    String first = list[0];
+
+    // Zygarde % Forms
+    if (first.contains("0")) {
       list[0] += "%";
     }
 
-    list = list.map((s) => s.capitalize()).toList();
+    // Mega & G-Max
+    else if (first == "Mega" || first == "Gmax") {
+      list[0] = list[0].toUpperCase();
+    }
 
-    return list.join(" ").trim();
+    return list.join(" ");
   }
 
   String species() {
