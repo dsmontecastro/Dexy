@@ -1,19 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import 'package:pokedex/extensions/string.dart';
 import 'package:pokedex/extensions/providers.dart';
 import 'package:pokedex/widgets/_misc/page_buttons.dart';
 
 import 'package:pokedex/database/models/pokemon.dart';
 import 'package:pokedex/database/models/species.dart';
 
-import 'gradience.dart';
-import 'pkmn_sprite.dart';
+import 'forms/gradience.dart';
+import 'forms/background.dart';
+import 'forms/form_stats.dart';
+import 'forms/form_sprite.dart';
 
 class Forms extends StatefulWidget {
   const Forms(this.species, {super.key});
-  // final List<int> formIDs;
   final Species species;
 
   @override
@@ -107,65 +107,51 @@ class FormsState extends State<Forms> {
   Widget build(context) {
     //
 
-    final Species species = widget.species;
-    final name = form.name.form(species.name);
+    final name = widget.species.name;
+
+    final pageView = PageView.builder(
+      physics: hasForms ? scrollOn : scrollOff,
+      dragStartBehavior: DragStartBehavior.start,
+      onPageChanged: changeForm,
+      controller: controller,
+      itemBuilder: (_, i) {
+        final Pokemon pkmn = forms[i % count];
+        return FormSprite(
+          form: pkmn,
+          species: name,
+          shiny: isShiny,
+          multi: hasForms,
+          toggle: toggleShiny,
+        );
+      },
+    );
 
     final buttons = PageButtons(
       shaded: false,
       hidden: !hasForms,
       prev: prevForm,
       next: nextForm,
+      space: 0.16,
     );
 
-    return LayoutBuilder(builder: (context, constraints) {
-      final double width = constraints.maxWidth;
-      final double padH = width * 0.15;
-
-      final pageView = PageView.builder(
-        physics: hasForms ? scrollOn : scrollOff,
-        dragStartBehavior: DragStartBehavior.start,
-        onPageChanged: changeForm,
-        controller: controller,
-        itemBuilder: (_, i) {
-          final Pokemon pkmn = forms[i % count];
-          return GestureDetector(
-            onTap: toggleShiny,
-            child: PKMNSprite(pkmn, isShiny),
-          );
-        },
-      );
-
-      return Container(
-        constraints: const BoxConstraints.expand(),
-        child: Stack(
-          children: [
-            //
-
-            TypeGradient(form.type1, form.type2),
-
-            Column(
+    return Stack(children: [
+      const Background(),
+      Row(
+        children: [
+          Expanded(flex: 55, child: FormStats(form)),
+          Expanded(
+            flex: 45,
+            child: Stack(
               children: [
-                const Spacer(flex: 2),
-                Expanded(
-                    flex: 4,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: padH),
-                      child: pageView,
-                    )),
-                Expanded(flex: 1, child: Text(name)),
-                const Spacer(flex: 1),
+                TypeGradient(form.type1, form.type2),
+                pageView,
+                buttons,
               ],
             ),
-
-            buttons,
-
-            //
-          ],
-        ),
-      );
-
-      //
-    });
+          ),
+        ],
+      ),
+    ]);
 
     //
   }

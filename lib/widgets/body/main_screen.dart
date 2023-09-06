@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/providers.dart';
 import 'package:pokedex/database/models/species.dart';
 
+import 'main_screen/forms.dart';
 import 'main_screen/app_bar.dart';
-import 'main_screen/data_bot.dart';
-import 'main_screen/data_top.dart';
+import 'main_screen/description.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen(this.barHeight, {super.key});
@@ -26,8 +26,8 @@ class MainScreen extends StatelessWidget {
             padding: EdgeInsets.only(top: barHeight * 0.8),
             child: Column(
               children: [
-                Expanded(flex: 7, child: DataTop(species, left)),
-                Expanded(flex: 3, child: DataBot(species)),
+                Expanded(flex: 7, child: Forms(species)),
+                Expanded(flex: 3, child: Description(species)),
               ],
             ),
           ),
