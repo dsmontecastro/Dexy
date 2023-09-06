@@ -32,20 +32,21 @@ extension Shortcuts on Typing {
   //
 
   String get text => name.toUpperCase();
-  Color get color => _typingColor[this] ?? Colors.transparent;
+  Color get bgColor => _bgColor[this] ?? Colors.transparent;
+  Color get boxColor => _boxColor[this] ?? Colors.transparent;
 
   List<double> get strengths => _strengthChart[0];
   List<double> get weaknesses => _weaknessChart[0];
 
   // Constants -----------------------------------------------------------------
 
-  static final Map<Typing, Color> _typingColor = {
-    Typing.error: Colors.grey,
+  static final Map<Typing, Color> _bgColor = {
+    Typing.error: const Color(0x00000000),
     Typing.normal: const Color(0xffA8A77A),
     Typing.fighting: const Color(0xffC22E28),
     Typing.flying: const Color(0xff91b0fe),
     Typing.poison: const Color(0xffA33EA1),
-    Typing.ground: const Color(0xffE2BF65),
+    Typing.ground: const Color(0xffE0C068),
     Typing.rock: const Color(0xffB6A136),
     Typing.bug: const Color(0xffA8B820),
     Typing.ghost: const Color(0xff735797),
@@ -53,8 +54,7 @@ extension Shortcuts on Typing {
     Typing.fire: const Color(0xffEE8130),
     Typing.water: const Color(0xff6390F0),
     Typing.grass: const Color(0xff78C850),
-    // Typing.grass: const Color(0xff40b088),
-    Typing.electric: const Color(0xffF8D030),
+    Typing.electric: const Color(0xffFFEB3B),
     Typing.psychic: const Color(0xffF95587),
     Typing.ice: const Color(0xff96D9D6),
     Typing.dragon: const Color(0xff6F35FC),
@@ -64,29 +64,29 @@ extension Shortcuts on Typing {
     Typing.shadow: Colors.black,
   };
 
-  // static final Map<Typing, Color> _typingColor = {
-  //   Typing.error: Colors.grey,
-  //   Typing.normal: const Color(0xffA8A77A),
-  //   Typing.fighting: const Color(0xffC22E28),
-  //   Typing.flying: const Color(0xffA98FF3),
-  //   Typing.poison: const Color(0xffA33EA1),
-  //   Typing.ground: const Color(0xffE2BF65),
-  //   Typing.rock: const Color(0xffB6A136),
-  //   Typing.bug: const Color(0xffA6B91A),
-  //   Typing.ghost: const Color(0xff735797),
-  //   Typing.steel: const Color(0xffB7B7CE),
-  //   Typing.fire: const Color(0xffEE8130),
-  //   Typing.water: const Color(0xff6390F0),
-  //   Typing.grass: const Color(0xff7AC74C),
-  //   Typing.electric: const Color(0xffF7D02C),
-  //   Typing.psychic: const Color(0xffF95587),
-  //   Typing.ice: const Color(0xff96D9D6),
-  //   Typing.dragon: const Color(0xff6F35FC),
-  //   Typing.dark: const Color(0xff705746),
-  //   Typing.fairy: const Color(0xffD685AD),
-  //   Typing.uknown: Colors.white,
-  //   Typing.shadow: Colors.black,
-  // };
+  static final Map<Typing, Color> _boxColor = {
+    Typing.error: Colors.grey,
+    Typing.normal: const Color(0xffA8A77A),
+    Typing.fighting: const Color(0xffC22E28),
+    Typing.flying: const Color(0xff91b0fe),
+    Typing.poison: const Color(0xffA33EA1),
+    Typing.ground: const Color(0xffE0C068),
+    Typing.rock: const Color(0xffB6A136),
+    Typing.bug: const Color(0xffA8B820),
+    Typing.ghost: const Color(0xff735797),
+    Typing.steel: const Color(0xffB7B7CE),
+    Typing.fire: const Color(0xffEE8130),
+    Typing.water: const Color(0xff6390F0),
+    Typing.grass: const Color(0xff78C850),
+    Typing.electric: const Color(0xffF8D030),
+    Typing.psychic: const Color(0xffF95587),
+    Typing.ice: const Color(0xff96D9D6),
+    Typing.dragon: const Color(0xff6F35FC),
+    Typing.dark: const Color(0xff705746),
+    Typing.fairy: const Color(0xffEE99AC),
+    Typing.uknown: Colors.white,
+    Typing.shadow: Colors.black,
+  };
 
   static const List<List<double>> _strengthChart = [
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], // Error
