@@ -127,8 +127,9 @@ class Dex with ChangeNotifier {
 
     _pokedex = _species.where((s) {
       String name1 = s.name;
-      String name2 = name1.capitalize();
-      return name1.contains(name) || name2.contains(name);
+      String name2 = name1.species();
+      String name3 = name1.replaceAll("-", " ");
+      return name1.contains(name) || name2.contains(name) || name3.contains(name);
     }).toList();
 
     scroll(0);
