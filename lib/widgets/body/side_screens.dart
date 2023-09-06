@@ -71,6 +71,7 @@ class SideScreensState extends State<SideScreens> {
           padding: EdgeInsets.only(top: widget.barHeight),
           prev: prevPage,
           next: nextPage,
+          shaded: true,
         ),
 
         //

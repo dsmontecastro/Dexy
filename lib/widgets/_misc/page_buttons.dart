@@ -8,12 +8,14 @@ class PageButtons extends StatelessWidget {
     this.padding = EdgeInsets.zero,
     this.shaded = false,
     this.hidden = false,
+    this.space = 0.09,
   });
 
   final Function() prev;
   final Function() next;
 
   final EdgeInsets padding;
+  final double space;
   final bool shaded;
   final bool hidden;
 
@@ -24,23 +26,30 @@ class PageButtons extends StatelessWidget {
   Widget build(context) {
     return Visibility(
       visible: !hidden,
-      child: Padding(
-        padding: padding,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            PageButton(iconLeft, shaded, prev),
-            PageButton(iconRight, shaded, next),
-          ],
-        ),
-      ),
+      child: LayoutBuilder(builder: (context, constraints) {
+        final double width = constraints.maxWidth * space;
+
+        return Padding(
+          padding: padding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              PageButton(iconLeft, width, shaded, prev),
+              PageButton(iconRight, width, shaded, next),
+            ],
+          ),
+        );
+
+        //
+      }),
     );
   }
 }
 
 class PageButton extends StatelessWidget {
-  const PageButton(this.icon, this.shaded, this.func, {super.key});
+  const PageButton(this.icon, this.width, this.shaded, this.func, {super.key});
   final Function() func;
+  final double width;
   final bool shaded;
   final Icon icon;
 
@@ -48,14 +57,22 @@ class PageButton extends StatelessWidget {
 
   @override
   Widget build(context) {
+    final double iconWidth = width * 0.5;
+
     return Container(
-      color: shaded ? shade : null,
+      width: width,
       height: double.infinity,
-      child: IconButton(
-        icon: icon,
-        onPressed: func,
-        color: Colors.grey,
-        splashRadius: 0.1,
+      alignment: Alignment.center,
+      color: shaded ? shade : null,
+      child: Center(
+        child: IconButton(
+          icon: icon,
+          iconSize: iconWidth,
+          onPressed: func,
+          splashRadius: 0.1,
+          alignment: Alignment.center,
+          color: Colors.grey.shade900,
+        ),
       ),
     );
   }
