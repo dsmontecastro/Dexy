@@ -3,7 +3,10 @@
 # CREDITS:
 - Resources compiled from PokeAPI @ https://pokeapi.co/
 
+
 ## TO-DO:
 ### Tables/Models:
-- Add Num Extension "Clamp"
-- Work on UI (Menu > Main)
+- Finish Layouts
+## ADJUST SPRITES:
+- Gen 9 (800-1008)
+- Alt Forms (10001-10263)
