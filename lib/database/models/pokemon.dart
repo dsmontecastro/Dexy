@@ -144,7 +144,7 @@ class Pokemon implements Model {
         PokemonFields.heldItems: heldItems.join(separator),
         PokemonFields.moves: moves.join(separator),
         PokemonFields.evs: evs.toString(),
-        PokemonFields.baseStats: baseStats.toString(),
+        PokemonFields.baseStats: baseStats.getString(),
       };
 
   // Helper Functions
