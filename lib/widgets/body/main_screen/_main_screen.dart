@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/providers.dart';
 import 'package:pokedex/database/models/species.dart';
 
-import 'main_screen/forms.dart';
-import 'main_screen/app_bar.dart';
-import 'main_screen/description.dart';
+import 'forms.dart';
+import 'app_bar.dart';
+import 'description.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen(this.barHeight, {super.key});

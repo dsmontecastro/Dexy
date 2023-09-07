@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/providers.dart';
 
-import '_body.dart';
+import 'body/_body.dart';
 import '_drawer.dart';
 
 class Home extends StatelessWidget {

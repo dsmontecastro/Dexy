@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:pokedex/widgets/_misc/page_buttons.dart';
 
-import 'side_screens/_pages.dart';
+import '_pages.dart';
 
 class SideScreens extends StatefulWidget {
   const SideScreens(this.barHeight, {super.key});
