@@ -9,8 +9,8 @@ import 'package:pokedex/database/models/species.dart';
 
 import 'forms/gradience.dart';
 import 'forms/background.dart';
-import 'forms/form_stats.dart';
-import 'forms/form_sprite.dart';
+import 'forms/stats.dart';
+import 'forms/sprite.dart';
 
 class Forms extends StatefulWidget {
   const Forms(this.species, {super.key});
