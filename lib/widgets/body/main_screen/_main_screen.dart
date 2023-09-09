@@ -11,35 +11,27 @@ class MainScreen extends StatelessWidget {
   const MainScreen(this.barHeight, {super.key});
   final double barHeight;
 
-  static const double left = 0.35;
-
   @override
   Widget build(context) {
     Species species = context.dex.entry;
+    return Stack(
+      children: [
+        //
 
-    return LayoutBuilder(builder: (context, constraints) {
-      return Stack(
-        children: [
-          //
-
-          Padding(
-            padding: EdgeInsets.only(top: barHeight * 0.8),
-            child: Column(
-              children: [
-                Expanded(flex: 7, child: Forms(species)),
-                Expanded(flex: 3, child: Description(species)),
-              ],
-            ),
+        Padding(
+          padding: EdgeInsets.only(top: barHeight * 0.8),
+          child: Column(
+            children: [
+              Expanded(flex: 7, child: Forms(species)),
+              Expanded(flex: 3, child: Description(species)),
+            ],
           ),
+        ),
 
-          SizedBox(height: barHeight, child: MainAppBar(species, left)),
-          //
-        ],
-      );
+        SizedBox(height: barHeight, child: MainAppBar(species)),
 
-      //
-    });
-
-    //
+        //
+      ],
+    );
   }
 }

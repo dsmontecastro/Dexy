@@ -6,9 +6,10 @@ import 'app_bar/info.dart';
 import 'app_bar/order.dart';
 
 class MainAppBar extends StatelessWidget {
-  const MainAppBar(this.species, this.left, {super.key});
+  const MainAppBar(this.species, {super.key});
   final Species species;
-  final double left;
+
+  static const double left = 0.35;
 
   @override
   Widget build(context) {
