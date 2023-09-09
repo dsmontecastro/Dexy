@@ -52,12 +52,7 @@ class FormStatsState extends State<FormStats> {
   static const titleStyle = TextStyle(
     fontSize: 20,
     color: Colors.black,
-  );
-
-  static const cellStyle = TextStyle();
-
-  static const cellDecor = BoxDecoration(
-    border: Border.fromBorderSide(borderThick),
+    fontWeight: FontWeight.bold,
   );
 
   // State Controls ------------------------------------------------------------
@@ -88,11 +83,13 @@ class FormStatsState extends State<FormStats> {
     final Color color1 = form.type1.bgColor.withOpacity(0.8);
     final Color color2 = form.type2.bgColor.withOpacity(0.7);
 
+    final List<RadarEntry> entries = stats.getEntries(mode: StatMode.radar);
+
     final dataSet = RadarDataSet(
       entryRadius: 2,
+      dataEntries: entries,
       borderWidth: widthThick,
       borderColor: borderColor,
-      dataEntries: stats.getEntries(mode: StatMode.radar),
       fillColor: (type2 == Typing.error) ? color1.withLightness(0.3) : color2,
     );
 
@@ -126,6 +123,7 @@ class FormStatsState extends State<FormStats> {
 
       return Container(
         padding: padH,
+        color: Colors.grey.shade900.withOpacity(0.5),
         child: Column(children: [
           const Spacer(flex: 1),
           Expanded(flex: 6, child: Padding(padding: padV, child: chart)),
@@ -140,29 +138,42 @@ class FormStatsState extends State<FormStats> {
 class StatTable extends StatelessWidget {
   const StatTable(this.stats, {super.key});
   final Stats stats;
-  static final decor = BoxDecoration(
-    color: Colors.white,
-    border: Border.all(width: 2, color: Colors.grey.shade800),
+
+  static final color = Colors.grey.shade900;
+  static const style = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
   );
+
+  static final borderDecor = BoxDecoration(
+    color: Colors.white.withOpacity(0.25),
+    border: Border.all(width: 1, color: color),
+  );
+
+  Widget makeCell(String text, double size) {
+    return Container(
+      decoration: borderDecor,
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: style.copyWith(fontSize: size),
+      ),
+    );
+  }
 
   @override
   Widget build(context) {
     return LayoutBuilder(builder: (context, constraints) {
       final double width = constraints.maxWidth;
+      final fontSize = width * 0.04;
 
-      final style = TextStyle(fontSize: width * 0.04);
-
-      Widget makeCell(String text) {
-        return Container(
-          decoration: decor,
-          child: Text(text, style: style, textAlign: TextAlign.center),
-        );
-      }
-
-      final names = statNames.map((s) => makeCell(s)).toList();
-      final values = stats.toList().map((i) => makeCell(i.toString())).toList();
+      final names = statNames.map((s) => makeCell(s, fontSize)).toList();
+      final values = stats.toList().map((i) {
+        return makeCell(i.toString(), fontSize);
+      }).toList();
 
       return Table(
+        border: TableBorder.all(width: 2, color: color),
         children: [
           TableRow(children: names),
           TableRow(children: values),
