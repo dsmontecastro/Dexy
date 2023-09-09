@@ -53,11 +53,10 @@ class OrderBanner extends StatelessWidget {
   @override
   Widget build(context) {
     return ClipPath(
-      clipper: SlantRight(0.9),
+      clipper: SlantRightUp(0.9),
       child: Container(
         width: width,
         height: double.infinity,
-        alignment: Alignment.centerLeft,
         decoration: BoxDecoration(color: color),
       ),
     );
