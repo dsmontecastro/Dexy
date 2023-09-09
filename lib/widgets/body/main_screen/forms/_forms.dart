@@ -7,10 +7,10 @@ import 'package:pokedex/widgets/_misc/page_buttons.dart';
 import 'package:pokedex/database/models/pokemon.dart';
 import 'package:pokedex/database/models/species.dart';
 
-import 'forms/gradience.dart';
-import 'forms/background.dart';
-import 'forms/stats.dart';
-import 'forms/sprite.dart';
+import 'gradience.dart';
+import 'background.dart';
+import 'stats.dart';
+import 'sprite.dart';
 
 class Forms extends StatefulWidget {
   const Forms(this.species, {super.key});

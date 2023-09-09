@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/string.dart';
 import 'package:pokedex/database/models/species.dart';
 
-import 'app_bar/info.dart';
-import 'app_bar/order.dart';
+import 'info.dart';
+import 'order.dart';
 
 class MainAppBar extends StatelessWidget {
   const MainAppBar(this.species, {super.key});
