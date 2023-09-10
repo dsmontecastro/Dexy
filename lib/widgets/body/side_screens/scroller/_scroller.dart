@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-import 'scroller/body.dart';
-import 'scroller/search.dart';
+import 'body.dart';
+import 'search.dart';
 
 class Scroller extends StatelessWidget {
-  const Scroller(this.barHeight, {super.key});
-  final double barHeight;
+  const Scroller(this.bar, {super.key});
+  final double bar;
 
   @override
   Widget build(context) {
     return Column(
       children: [
-        SearchField(barHeight),
+        SearchField(bar),
         const Expanded(child: ScrollerBody()),
       ],
     );

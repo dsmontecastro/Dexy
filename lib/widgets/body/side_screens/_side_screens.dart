@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'package:pokedex/widgets/_misc/page_buttons.dart';
 
-import '_pages.dart';
+import 'pages.dart';
+import 'scroller/_scroller.dart';
 
 class SideScreens extends StatefulWidget {
   const SideScreens(this.barHeight, {super.key});
@@ -18,10 +19,12 @@ class SideScreensState extends State<SideScreens> {
 
   // Constants -----------------------------------------------------------------
 
+  static const physics = ScrollPhysics();
   static const duration = Duration(milliseconds: 150);
   static const curve = Curves.linear;
 
-  static const physics = ScrollPhysics();
+  static const double padH = 0.09;
+  static const double padV = 0.075;
 
   // PageView Elements & Controllers -------------------------------------------
 
@@ -50,6 +53,11 @@ class SideScreensState extends State<SideScreens> {
 
   @override
   Widget build(context) {
+    final double padBar = widget.barHeight;
+    // const padding = EdgeInsets.symmetric(horizontal: padH, vertical: padV);
+
+    return Scroller(padBar);
+
     return Stack(
       children: [
         //
@@ -62,15 +70,17 @@ class SideScreensState extends State<SideScreens> {
           physics: physics,
           itemBuilder: (_, i) {
             final int index = i % pageCount;
-            return pageList[index](widget.barHeight);
+            return pageList[index](padBar, padH, padV);
           },
         ),
 
         //
         PageButtons(
-          padding: EdgeInsets.only(top: widget.barHeight),
+          pads: EdgeInsets.only(top: padBar),
           prev: prevPage,
           next: nextPage,
+          spaceH: padH,
+          spaceV: padV,
           shaded: true,
         ),
 
