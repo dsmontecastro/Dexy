@@ -56,7 +56,7 @@ class TypingBox extends StatelessWidget {
         child: Text(
           name,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 10,
             color: Colors.white,
           ),

@@ -123,7 +123,8 @@ class FormStatsState extends State<FormStats> {
 
       return Container(
         padding: padH,
-        color: Colors.grey.shade900.withOpacity(0.5),
+        // color: Colors.grey.shade900.withOpacity(0.5),
+        color: Colors.white.withOpacity(0.5),
         child: Column(children: [
           const Spacer(flex: 1),
           Expanded(flex: 6, child: Padding(padding: padV, child: chart)),
@@ -146,7 +147,7 @@ class StatTable extends StatelessWidget {
   );
 
   static final borderDecor = BoxDecoration(
-    color: Colors.white.withOpacity(0.25),
+    // color: Colors.white.withOpacity(0.25),
     border: Border.all(width: 1, color: color),
   );
 

@@ -9,11 +9,11 @@ extension Shortcuts on Generation {
 
   String get text => name.capitalize();
 
-  Color get color => _GenerationColor[this] ?? Colors.transparent;
+  Color get color => _generationColor[this] ?? Colors.transparent;
 
   // Constants -----------------------------------------------------------------
 
-  static final Map<Generation, Color> _GenerationColor = {
+  static final Map<Generation, Color> _generationColor = {
     Generation.error: Colors.grey,
     Generation.kanto: const Color(0xffA8A77A),
     Generation.johto: const Color(0xffC22E28),
