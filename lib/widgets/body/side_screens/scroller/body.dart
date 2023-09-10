@@ -31,20 +31,60 @@ class ScrollerBody extends StatelessWidget {
       );
 
       final borderL = ClipPath(
-        clipper: SlantVerticalRight(0.6, 0.2),
+        clipper: const SlantVerticalRight(0.6, 0.2),
         child: Container(
-          color: color.withLightness(0.3),
-          width: maxGap * 0.75,
+          width: maxGap * 0.5,
           height: height,
+          color: color.withLightness(0.3),
         ),
       );
 
-      final borderC = ClipPath(
-        clipper: RoundRight(0.5),
+      final borderC1 = ClipPath(
+        clipper: const RoundRight(0.6),
         child: Container(
-          color: color,
           width: maxGap * 1.5,
           height: height,
+          color: color,
+        ),
+      );
+
+      final borderC2 = Container(
+        alignment: Alignment.centerLeft,
+        child: ClipPath(
+          clipper: const RoundRight(0.2),
+          child: Container(
+            width: maxGap * 1.5,
+            height: height * 0.9,
+            color: color.withLightness(0.2),
+          ),
+        ),
+      );
+
+      // final circle = Container(
+      //   width: maxGap,
+      //   height: height,
+      //   alignment: Alignment.center,
+      //   child: ClipRRect(
+      //     borderRadius: BorderRadius.circular(300.0),
+      //     child: Container(
+      //       width: maxGap * 0.8,
+      //       height: maxGap * 0.8,
+      //       color: color.withLightness(0.4),
+      //     ),
+      //   ),
+      // );
+
+      final pointer = Container(
+        width: maxGap * 1.15,
+        height: height * 1,
+        alignment: Alignment.centerRight,
+        child: ClipPath(
+          clipper: const TriangleRight(0.2),
+          child: Container(
+            width: maxGap / 2,
+            height: maxGap / 2,
+            color: color.withLightness(0.3),
+          ),
         ),
       );
 
@@ -54,8 +94,10 @@ class ScrollerBody extends StatelessWidget {
         child: Stack(children: [
           ScrollList(maxGap, padV),
           IgnorePointer(child: borderV),
-          IgnorePointer(child: borderC),
+          IgnorePointer(child: borderC1),
+          IgnorePointer(child: borderC2),
           IgnorePointer(child: borderL),
+          IgnorePointer(child: pointer),
         ]),
       );
 
@@ -103,7 +145,7 @@ class ScrollListState extends State<ScrollList> {
       controller: controller,
 
       child: Container(
-        padding: EdgeInsets.fromLTRB(0, padV * 2, 20, padV),
+        padding: EdgeInsets.fromLTRB(0, padV * 4, 20, 0),
         // padding: const EdgeInsets.only(right: 20),
         child: PageView.builder(
           padEnds: true,

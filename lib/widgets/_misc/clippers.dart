@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/num.dart';
 
 class SlantRightUp extends CustomClipper<Path> {
-  SlantRightUp(this.offset);
+  const SlantRightUp(this.offset);
   final double offset;
 
   @override
@@ -25,7 +25,7 @@ class SlantRightUp extends CustomClipper<Path> {
 }
 
 class SlantRightDown extends CustomClipper<Path> {
-  SlantRightDown(this.offset);
+  const SlantRightDown(this.offset);
   final double offset;
 
   @override
@@ -48,7 +48,7 @@ class SlantRightDown extends CustomClipper<Path> {
 }
 
 class SlantVerticalRight extends CustomClipper<Path> {
-  SlantVerticalRight(this.offH, this.offV);
+  const SlantVerticalRight(this.offH, this.offV);
   final double offH;
   final double offV;
 
@@ -75,7 +75,7 @@ class SlantVerticalRight extends CustomClipper<Path> {
 }
 
 class SlantVerticalLeft extends CustomClipper<Path> {
-  SlantVerticalLeft(this.offH, this.offV);
+  const SlantVerticalLeft(this.offH, this.offV);
   final double offH;
   final double offV;
 
@@ -103,7 +103,7 @@ class SlantVerticalLeft extends CustomClipper<Path> {
 }
 
 class RoundRight extends CustomClipper<Path> {
-  RoundRight(this.offset);
+  const RoundRight(this.offset);
   final double offset;
 
   @override
@@ -119,6 +119,30 @@ class RoundRight extends CustomClipper<Path> {
     path.quadraticBezierTo(w, h / 2, o, h);
     path.lineTo(o, h);
     path.lineTo(0, h);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(oldClipper) => false;
+}
+
+class TriangleRight extends CustomClipper<Path> {
+  const TriangleRight(this.inset);
+  final double inset;
+
+  @override
+  Path getClip(Size size) {
+    assert(inset.inRange(0, 1));
+
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+    final i = w * inset;
+
+    path.lineTo(w, h / 2);
+    path.lineTo(0, h);
+    path.lineTo(i, h / 2);
     path.close();
     return path;
   }
