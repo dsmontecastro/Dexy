@@ -6,8 +6,8 @@
 
 ## TO-DO:
 ### APP PROPER:
-- Finish Layouts
 - Finalize ScrollerItem
+- Fix Description text-wrapping
 - Move Pages to EndDrawer
   
 ## ADJUST SPRITES:
