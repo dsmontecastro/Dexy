@@ -127,11 +127,11 @@ class FormsState extends State<Forms> {
     );
 
     final buttons = PageButtons(
-      shaded: false,
       hidden: !hasForms,
       prev: prevForm,
       next: nextForm,
-      space: 0.16,
+      spaceH: 0.16,
+      shaded: false,
     );
 
     return Stack(children: [
