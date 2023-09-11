@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '_test.dart'; // TEMP
-import 'scroller/_scroller.dart';
 
 typedef PageMaker = Widget Function(double bar, double padH, double padV);
 
 final List<PageMaker> pageList = [
-  (b, h, v) => PageWrapper(h, v, Scroller(b)),
   (b, h, v) => Test(1, b),
   (b, h, v) => Test(2, b),
   (b, h, v) => Test(3, b),

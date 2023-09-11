@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:pokedex/widgets/_misc/page_buttons.dart';
 
 import 'pages.dart';
-import 'scroller/_scroller.dart';
 
 class SideScreens extends StatefulWidget {
   const SideScreens(this.barHeight, {super.key});
@@ -55,8 +54,6 @@ class SideScreensState extends State<SideScreens> {
   Widget build(context) {
     final double padBar = widget.barHeight;
     // const padding = EdgeInsets.symmetric(horizontal: padH, vertical: padV);
-
-    return Scroller(padBar);
 
     return Stack(
       children: [
