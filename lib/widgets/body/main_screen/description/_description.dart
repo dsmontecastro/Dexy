@@ -33,7 +33,7 @@ class Description extends StatelessWidget {
               //
 
               ClipPath(
-                clipper: SlantRightDown(0.8),
+                clipper: const SlantRightDown(0.8),
                 child: Container(
                   color: innerColor,
                   width: width * 0.15,
