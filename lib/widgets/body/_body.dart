@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'main_screen/_main_screen.dart';
-import 'side_screens/_side_screens.dart';
+import 'scroller/_scroller.dart';
 
 class Body extends StatelessWidget {
   const Body({super.key});
@@ -28,7 +28,7 @@ class Body extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(child: MainScreen(barHeight)),
-              Expanded(child: SideScreens(barHeight * 0.8)),
+              Expanded(child: Scroller(barHeight * 0.8)),
             ],
           ),
         );
