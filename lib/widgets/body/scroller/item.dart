@@ -38,10 +38,10 @@ class ScrollItem extends StatelessWidget {
       final double width = constraints.maxWidth;
       final double gap = getGap(index);
 
-      return AnimatedContainer(
-        width: width / 15,
-        height: height * 0.1,
-        duration: duration,
+      return Container(
+        // width: width / 15,
+        // height: height * 0.1,
+        // duration: duration,
         alignment: Alignment.center,
         margin: EdgeInsets.only(bottom: 10, left: gap),
         decoration: BoxDecoration(
