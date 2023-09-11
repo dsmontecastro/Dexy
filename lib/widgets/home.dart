@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pokedex/extensions/providers.dart';
 
 import 'body/_body.dart';
-import '_drawer.dart';
+import 'menu/_menu.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -19,7 +19,7 @@ class Home extends StatelessWidget {
       home: Scaffold(
         key: context.key,
         body: const Body(),
-        drawer: const NavDrawer(),
+        drawer: const Menu(),
         drawerScrimColor: Colors.transparent,
       ),
     );

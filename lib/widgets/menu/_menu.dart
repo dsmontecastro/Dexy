@@ -6,8 +6,8 @@ import 'package:pokedex/extensions/providers.dart';
 const Icon back = Icon(Icons.arrow_back);
 const Icon load = Icon(Icons.refresh);
 
-class NavDrawer extends StatelessWidget {
-  const NavDrawer({super.key});
+class Menu extends StatelessWidget {
+  const Menu({super.key});
 
   @override
   Widget build(context) {
@@ -26,7 +26,7 @@ class NavDrawer extends StatelessWidget {
               alignment: Alignment.topLeft,
               onPressed: context.drawNav,
             ),
-            const NavMenu(),
+            const MenuBody(),
             IconButton(
               icon: load,
               alignment: Alignment.bottomLeft,
@@ -48,8 +48,8 @@ class NavDrawer extends StatelessWidget {
   }
 }
 
-class NavMenu extends StatelessWidget {
-  const NavMenu({super.key});
+class MenuBody extends StatelessWidget {
+  const MenuBody({super.key});
 
   @override
   Widget build(context) {
