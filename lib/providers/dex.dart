@@ -187,6 +187,7 @@ class Dex with ChangeNotifier {
   Future<bool> favorite(Species s) async {
     try {
       await DB.instance.toggleFavorite(s);
+      notifyListeners();
       return true;
     } catch (err) {
       return false;
@@ -196,6 +197,7 @@ class Dex with ChangeNotifier {
   Future<bool> caught(Species s) async {
     try {
       await DB.instance.toggleCaught(s);
+      notifyListeners();
       return true;
     } catch (err) {
       return false;
