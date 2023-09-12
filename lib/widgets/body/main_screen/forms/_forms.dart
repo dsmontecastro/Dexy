@@ -130,8 +130,8 @@ class FormsState extends State<Forms> {
       hidden: !hasForms,
       prev: prevForm,
       next: nextForm,
-      spaceH: 0.16,
       shaded: false,
+      spaceH: 0.16,
     );
 
     return Stack(children: [
