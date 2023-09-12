@@ -6,9 +6,9 @@
 
 ## TO-DO:
 ### APP PROPER:
-- Finalize ScrollerItem
-- Fix Description text-wrapping
-- Move Pages to EndDrawer
+- Fix Description text-wrapping (Gen 9)
+- Implement SideScreens as EndDrawer
+- Adjust criteria for Orientation?
   
 ## ADJUST SPRITES:
 - Gen 9 (800-1008)
