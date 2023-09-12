@@ -18,22 +18,30 @@ class SearchField extends StatelessWidget {
       controller.jumpTo(0);
     }
 
-    final padding = EdgeInsets.symmetric(
-      horizontal: 25,
-      vertical: height * 0.2,
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      final double width = constraints.maxWidth;
 
-    return Container(
-      color: color,
-      height: height,
-      child: Padding(
+      final padding = EdgeInsets.symmetric(
+        horizontal: width * 0.05,
+        vertical: height * 0.15,
+      );
+
+      return Container(
+        color: color,
+        width: width,
+        height: height,
         padding: padding,
-        child: SearchBar(
-          leading: icon,
-          onChanged: filter,
-          hintText: "Search...",
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: SearchBar(
+            leading: icon,
+            onChanged: filter,
+            hintText: "Search...",
+          ),
         ),
-      ),
-    );
+      );
+
+      //
+    });
   }
 }

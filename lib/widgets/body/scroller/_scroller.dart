@@ -47,7 +47,7 @@ class ScrollerState extends State<Scroller> {
       final double width = constraints.maxWidth;
 
       final double maxGap = width * 0.3;
-      final double padV = height * 0.01;
+      final double padV = height * 0.02;
 
       // Layout Components -----------------------------------------------------
 
@@ -120,7 +120,7 @@ class ScrollerState extends State<Scroller> {
             // Pointer
             Container(
               height: height,
-              width: maxGap * 1.25,
+              width: maxGap * 1.26,
               // color: Colors.blue.withOpacity(0.9),
               alignment: Alignment.centerRight,
               child: ClipPath(
