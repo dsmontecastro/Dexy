@@ -29,15 +29,13 @@ class ScrollerState extends State<Scroller> {
     initialPage: 0,
   );
 
-  // Index State -----------------------------------------------------------
+  // Angle State -----------------------------------------------------------
 
-  int index = 0;
+  double angle = 0;
 
   void scroll(int i) {
-    setState(() {
-      index = i;
-      context.db.scroll(index);
-    });
+    setState(() => angle = i % 360);
+    context.db.scroll(i);
   }
 
   @override
@@ -53,72 +51,90 @@ class ScrollerState extends State<Scroller> {
 
       // Layout Components -----------------------------------------------------
 
-      final panel = Container(height: padV, color: bgColor);
+      final vPanels = Container(height: padV, color: bgColor);
 
-      final borderV = Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [panel, panel],
-      );
+      final Widget layoutDesigns = IgnorePointer(
+        child: Stack(
+          children: [
+            //
 
-      final borderC = ClipPath(
-        clipper: const RoundRight(0.6),
-        child: Container(
-          width: maxGap * 1.5,
-          height: height,
-          color: bgColor,
-        ),
-      );
+            // Vertical Pads
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [vPanels, vPanels],
+            ),
 
-      final borderL1 = ClipPath(
-        clipper: const SlantVerticalRight(0.6, 0.2),
-        child: Container(
-          width: maxGap * 0.8,
-          height: height,
-          color: baseColor.withLightness(0.2),
-        ),
-      );
-
-      final borderL2 = ClipPath(
-        clipper: const SlantVerticalRight(0.6, 0.2),
-        child: Container(
-          width: maxGap * 0.5,
-          height: height,
-          color: baseColor,
-        ),
-      );
-
-      final gear = Container(
-        width: maxGap * 1.5,
-        height: height,
-        alignment: Alignment.centerLeft,
-        child: Stack(children: [
-          Positioned(
-            left: -maxGap * 1.4,
-            height: height,
-            child: Transform.rotate(
-              angle: index % 360,
-              child: Image.asset(
-                "assets/images/gear.png",
-                width: maxGap * 2.5,
-                height: maxGap * 2.5,
-                color: baseColor.withLightness(0.4),
+            // Circular Pad
+            ClipPath(
+              clipper: const RoundRight(0.6),
+              child: Container(
+                height: height,
+                width: maxGap * 1.5,
+                color: bgColor,
               ),
             ),
-          )
-        ]),
-      );
 
-      final pointer = Container(
-        width: maxGap * 1.25,
-        height: height * 1,
-        alignment: Alignment.centerRight,
-        child: ClipPath(
-          clipper: const TriangleRight(0.2),
-          child: Container(
-            width: maxGap / 2.5,
-            height: maxGap / 2,
-            color: baseColor,
-          ),
+            // Left-Under Pad
+            ClipPath(
+              clipper: const SlantVerticalRight(0.3, 0.25),
+              child: Container(
+                height: height,
+                width: maxGap * 0.9,
+                color: baseColor.withLightness(0.2),
+              ),
+            ),
+
+            // Spin-Gear
+            Container(
+              height: height,
+              width: maxGap * 1.1,
+              alignment: Alignment.center,
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: 0,
+                    height: height,
+                    width: width / 2,
+                    child: Transform.rotate(
+                      angle: angle,
+                      child: Image.asset(
+                        "assets/images/gear.png",
+                        color: baseColor.withLightness(0.4),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Left-Over Pad
+            ClipPath(
+              clipper: const SlantVerticalRight(0.6, 0.2),
+              child: Container(
+                height: height,
+                width: maxGap * 0.5,
+                color: baseColor,
+              ),
+            ),
+
+            // Pointer
+            Container(
+              height: height,
+              width: maxGap * 1.25,
+              // color: Colors.blue.withOpacity(0.9),
+              alignment: Alignment.centerRight,
+              child: ClipPath(
+                clipper: const TriangleRight(0.2),
+                child: Container(
+                  height: maxGap / 2,
+                  width: maxGap / 2,
+                  color: baseColor,
+                ),
+              ),
+            ),
+
+            //
+          ],
         ),
       );
 
@@ -131,12 +147,7 @@ class ScrollerState extends State<Scroller> {
               constraints: const BoxConstraints.expand(),
               child: Stack(children: [
                 ScrollList(maxGap, padV, controller, scroll),
-                IgnorePointer(child: borderV),
-                IgnorePointer(child: borderC),
-                IgnorePointer(child: borderL1),
-                IgnorePointer(child: gear),
-                IgnorePointer(child: borderL2),
-                IgnorePointer(child: pointer),
+                layoutDesigns,
               ]),
             ),
           ),
