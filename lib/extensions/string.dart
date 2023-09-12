@@ -70,7 +70,7 @@ extension MoreStrings on String {
 
     // Special Case: Ho-oh + Kommo-o Line
     if (contains("-o")) {
-      return this;
+      return list.join("");
     }
 
     // Special Case: Nidoran-♂/♀
@@ -86,11 +86,14 @@ extension MoreStrings on String {
 
     // Special Case: The Mimes
     else if (startsWith("mr") || endsWith("jr")) {
-      index = indexOf("-") + 1;
+      index = indexOf("-");
+      list[index] = "";
+
+      index += 1;
       list[index] = list[index].toUpperCase();
 
       index = indexOf("r");
-      list[index] = ". ";
+      list[index] = "r. ";
     }
 
     // General: Capitalize First & After-Dash
